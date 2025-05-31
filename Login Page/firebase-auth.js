@@ -9,16 +9,17 @@ const firebaseConfig = {
     measurementId: "G-ZGJGQFNW1R"
 };
 
-// Initialize Firebase
+// Modular imports for CDN
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+const auth = getAuth(app);
 
 // Google sign-in
 document.querySelectorAll('.fa-google').forEach(el => {
   el.parentElement.addEventListener('click', function(e) {
     e.preventDefault();
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider)
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
       .then(result => {
         alert('Signed in as: ' + result.user.displayName);
       })
@@ -32,8 +33,8 @@ document.querySelectorAll('.fa-google').forEach(el => {
 document.querySelectorAll('.fa-facebook').forEach(el => {
   el.parentElement.addEventListener('click', function(e) {
     e.preventDefault();
-    const provider = new firebase.auth.FacebookAuthProvider();
-    firebase.auth().signInWithPopup(provider)
+    const provider = new FacebookAuthProvider();
+    signInWithPopup(auth, provider)
       .then(result => {
         alert('Signed in as: ' + result.user.displayName);
       })
@@ -47,8 +48,8 @@ document.querySelectorAll('.fa-facebook').forEach(el => {
 document.querySelectorAll('.fa-twitter').forEach(el => {
   el.parentElement.addEventListener('click', function(e) {
     e.preventDefault();
-    const provider = new firebase.auth.TwitterAuthProvider();
-    firebase.auth().signInWithPopup(provider)
+    const provider = new TwitterAuthProvider();
+    signInWithPopup(auth, provider)
       .then(result => {
         alert('Signed in as: ' + result.user.displayName);
       })
