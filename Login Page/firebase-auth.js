@@ -1,7 +1,3 @@
-// Import Firebase scripts in your HTML before this file:
-// <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-// <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
-
 // Your Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBG3mHcQWenC_jOq4aQzoT8CuvnBtxF3jM",
