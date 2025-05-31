@@ -259,3 +259,7 @@ a {
         width: 90%;
     }
 }
+
+a:visited {
+    color: inherit; /* Ensures visited links maintain the same color */
+}

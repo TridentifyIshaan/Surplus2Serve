@@ -290,3 +290,7 @@ footer {
         color: var(--primary-color);
     }
 }
+
+a:visited {
+    color: inherit; /* Ensures visited links maintain the same color */
+}

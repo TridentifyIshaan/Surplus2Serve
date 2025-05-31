@@ -1,0 +1,191 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap'); /* New font import */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Quicksand', sans-serif;
+}
+
+/* Animation Background */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(45deg, #fff700, #ff6f1a); /* yellow to orange */
+}
+
+section {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    flex-wrap: wrap;
+    overflow: hidden;
+}
+
+section::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(#fff700, #ff6f1a, #fff700); /* yellow to orange to yellow */
+    animation: animate 5s linear infinite;
+}
+
+@keyframes animate {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(100%);
+    }
+}
+
+section span {
+    position: relative;
+    display: block;
+    width: calc(6.25vw - 2px);
+    height: calc(6.25vw - 2px);
+    background: #ff6f1a; /* orange */
+    z-index: 2;
+    transition: 1.5s;
+    top: -300px;
+    outline: 2px solid blue; /* green outline */
+    margin: 10px;
+}
+
+/* Hover Effect for each square block*/
+section span:nth-child(1):hover {
+    background: #43b043 ; /* green */
+    transition: 1s;
+}
+
+section span:nth-child(2):hover {
+    background: #fff700; /* yellow */
+    transition: 1s;
+}
+
+section span:nth-child(3):hover {
+    background: red; /* orange */
+    transition: 1s;
+}
+
+section span:nth-child(4):hover {
+    background: green ; /* green */
+    transition: 1s;
+}
+
+/* Contact Form Styling */
+.contact-form {
+    position: absolute;
+    z-index: 3;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 50%; /* Default width for larger screens */
+    max-width: 600px; /* Maximum width */
+}
+
+.contact-form h2 {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    color: #e94e1b; /* orange-red */
+}
+
+.contact-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #43b043; /* green */
+    font-family: 'Roboto', sans-serif; /* New font family */
+}
+
+.contact-form input, .contact-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1.5px solid #43b043; /* green border */
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: #fffbe6; /* light yellow */
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.contact-form input:focus, .contact-form textarea:focus {
+    border-color: #ff6f1a; /* orange */
+    box-shadow: 0 0 5px rgba(255, 111, 26, 0.5);
+    outline: none;
+}
+
+.contact-form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #43b043; /* green */
+    border: none;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Hover Effect */
+.contact-form button:hover {
+    background-color: #ff6f1a; /* orange */
+    color: #fff700; /* yellow */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .contact-form {
+        width: 80%;
+        padding: 15px;
+    }
+
+    .contact-form h2 {
+        font-size: 1.5em;
+    }
+
+    .contact-form input, .contact-form textarea {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .contact-form button {
+        padding: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-form {
+        width: 90%;
+        padding: 10px;
+    }
+
+    .contact-form h2 {
+        font-size: 1.2em;
+    }
+
+    .contact-form input, .contact-form textarea {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .contact-form button {
+        padding: 6px;
+    }
+}
+
+a:visited {
+    color: inherit; /* Ensures visited links maintain the same color */
+}

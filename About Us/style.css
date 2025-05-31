@@ -1,0 +1,110 @@
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(45deg, #fff700, #ff6f1a); /* yellow to orange */
+    display: flex;
+    flex-direction: column; /* Stack header and cards vertically */
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.header {
+    background: linear-gradient(45deg, #43b043, green); /* green to orange */
+    color: white;
+    padding: 10px 20px;
+    text-align: justify;
+    font-size: 24px;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 5px 5px 5px rgba(244, 7, 7, 0.244);
+    width: 80%;
+    margin: 30px 0 30px 0;
+    box-sizing: border-box;
+}
+
+.header h1 {
+    font-family: 'Inter', 'Roboto', 'Segoe UI', Arial, sans-serif;
+    letter-spacing: 2px;
+}
+
+.cards-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card {
+    background-color: #f5d7b2;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-style: groove;
+    border-color: #43b043;
+    width: 200px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card img {
+    width: 130px;      /* Increased width */
+    height: 130px;     /* Increased height */
+    object-fit: cover; /* Ensures the face fills the frame */
+    object-position: top;
+    border-radius: 50%;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    border: 3px solid #43b043; /* Border color matching the card */
+    border-style: inherit;
+}
+
+.card h3 {
+    margin: 10px 0;
+    font-size: 18px;
+    color: #43b043;
+}
+
+.card p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.card img.srujal{
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 15px
+}
+
+.social-icons {
+    margin-top: 10px;
+}
+
+.social-icons a {
+    margin: 0 5px;
+    display: inline-block;
+    color: #ff6f1a; /* Orange for icons */
+    transition: color 0.2s;
+}
+
+.social-icons a:hover {
+    color: #43b043; /* Green on hover */
+}
+
+.social-icons i {
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+}
+
+ul li {
+    list-style-type: none;
+    margin: 20px;
+}
+
+a:visited {
+    color: inherit; /* Ensures visited links maintain the same color */
+}
