@@ -1,0 +1,292 @@
+/* Basic Good Practice */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Global variables */
+:root {
+    --primary-color: #5CB338;
+    --secondary-color: yellow;
+    --tertiary-color: rgb(248, 192, 89);
+    --footer-color: wheat;
+    --text-color: orangered;
+    --text-color-light: lightgreen;
+    --universal-color: white;
+    --prim-font-fam: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    --sec-font-fam: 'Fira Sans', 'Quicksand', 'Nunito', 'Segoe UI', Arial, sans-serif;
+}
+
+/* Header and Navigation */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+nav {
+    background-color: var(--primary-color);
+    height: 70px;
+    padding: 0 20px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+nav ul {
+    display: flex;
+    gap: 24px;
+    list-style: none;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    border: 2px solid var(--text-color-light);
+    padding: 8px 18px;
+    box-shadow: 2px 2px 0px green;
+    font-size: 20px;
+    color: var(--universal-color);
+    font-family: var(--prim-font-fam);
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
+    /*Skew property of transform*/
+    transform: skew(2.5deg);
+}
+
+nav ul li:hover {
+    background: var(--tertiary-color);
+    color: var(--primary-color);
+}
+
+/* Main Content */
+main {
+    background-color: var(--secondary-color);
+    padding: 40px 0 60px 0;
+    color: var(--text-color);
+    text-align: center;
+    min-height: 80vh;
+}
+
+/* Text Box */
+.text-box {
+    padding: 24px 32px;
+    border: 5px ridge var(--tertiary-color);
+    outline: 5px ridge var(--text-color);
+    margin: 0 auto 50px auto;
+    font-size: 2em;
+    border-radius: 13px;
+    font-family: var(--sec-font-fam);
+    font-weight: bolder;
+    text-shadow: 2px 2px 4px var(--tertiary-color);
+    max-width: 600px;
+    background: var(--footer-color);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Container for Boxes */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 32px;
+    background-color: var(--text-color);
+    margin: 24px 34px;
+    padding: 40px 24px;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    flex-wrap: wrap;
+}
+
+/* Individual Boxes */
+.box1, .box2 {
+    background-color: var(--tertiary-color);
+    min-height: 340px;
+    width: 45%;
+    min-width: 280px;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0 12px;
+    color: var(--universal-color);
+    border-radius: 12px;
+    padding: 32px 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    box-sizing: border-box;
+    /*Skew property of transform in Y direction*/
+    transform: skewY(-1.5deg);
+}
+
+.box1 h2, .box2 h2 {
+    color: var(--primary-color);
+    font-family: var(--prim-font-fam);
+    margin-bottom: 18px;
+    font-size: 1.5em;
+    text-align: left;
+    width: 100%;
+}
+
+.box1 ul, .box2 ol {
+    color: #333;
+    font-family: var(--sec-font-fam);
+    font-size: 1em;
+    margin: 8px 0 0 0;         /* Remove left margin */
+    padding: 10px 16px;         /* Even padding on all sides */
+    background: rgba(255,255,255,0.7);
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;           /* Contain floated or oversized children */
+}
+
+.box1 ul li, .box2 ol li {
+    margin-left: 10px;
+    margin-bottom: 12px;
+    color: #333;
+    background: transparent;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-weight: 500;
+    word-break: break-word;     /* Prevent long text from overflowing */
+    line-height: 1.4;
+    text-align: justify;
+}
+
+.box1 ul li:last-child, .box2 ol li:last-child {
+    margin-bottom: 0;
+}
+
+/* Orange Floating Box */
+.orange-box {
+    height: 50px;
+    width: 50px;
+    background: var(--tertiary-color);
+    position: fixed;
+    bottom: 18px;
+    right: 28px;
+    border: 2px solid var(--universal-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+    /* border-radius: 60px; */
+    z-index: 100;
+
+    /* Aligning the content */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /*Transform*/
+    /*NOTE- Only one transform property can be applied at a time, so choose one of the following but if you want to apply multiple transforms, you can chain them together like this: transform: rotate(45deg) translate(-20%, 10%); */
+    
+    /*Rotation*/
+    /* transform: rotate(45deg); OR rotate(.125turn); */
+
+    /*Scale - enlarge or shrink the box*/
+    /* Translation - move the box */
+    /* transform:  scale(1.2) translate(-20%, 10%); */
+    
+    /*Transform origin - change the point around which the box rotates or scales*/
+    /* transform: origin 0% 0%; */
+
+    /*Transitions & Transforms*/
+    transition: transform 0.5s ease; /* Adjust the duration and easing as needed */
+}
+
+.orange-box:hover{
+  transform: rotate(1.125turn);
+}
+
+.orange-box img {
+    object-fit: contain;
+}
+
+/* Footer */
+footer {
+    height: 100px;
+    background-color: var(--footer-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--sec-font-fam);
+    font-size: 1.2em;
+    color: #444;
+    margin-top: 24px;
+}
+
+/* Responsive Design */
+@media (max-width: 1100px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+    }
+    .box1, .box2 {
+        width: 90%;
+        max-width: 600px;
+    }
+}
+
+@media (max-width: 700px) {
+    .text-box {
+        font-size: 1.2em;
+        padding: 16px 8px;
+        max-width: 95vw;
+    }
+    .container {
+        margin: 12px 4vw;
+        padding: 20px 4vw;
+    }
+    .box1, .box2 {
+        padding: 18px 8px;
+        font-size: 0.95em;
+    }
+    nav ul li {
+        font-size: 16px;
+        padding: 6px 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    nav {
+        height: auto;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 12px;
+    }
+
+    nav ul {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    nav ul li {
+        width: 100%;
+        text-align: left;
+        padding: 8px 18px;
+        font-size: 18px;
+        border: 2px solid var(--text-color-light);
+        box-shadow: 2px 2px 0px green;
+        transform: skew(2.5deg);
+        font-family: var(--prim-font-fam);
+        color: var(--universal-color);
+        background-color: var(--primary-color);
+        transition: background 0.2s, color 0.2s;
+    }
+
+    nav ul li:hover {
+        background: var(--tertiary-color);
+        color: var(--primary-color);
+    }
+}
