@@ -127,13 +127,16 @@ th {
     padding: 6px;
     text-align:center;
     color: var(--orange);
+    text-shadow: 0 0 12px #ff6f1a; /* Glow effect */
 }
+
 td {
     background-color: var(--primary);
     border:2px solid black;
     padding: 6px;
     text-align:center;
-    color: var(--yellow)
+    color: var(--yellow);
+    text-shadow: 0 0 6px #fff700, 0 0 10px #ff6f1a; /* Glow effect */
 }
 
 @keyframes gradient-move {
