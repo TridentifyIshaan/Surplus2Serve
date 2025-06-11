@@ -21,7 +21,7 @@
 
 body {
     min-height: 100vh;
-    background: linear-gradient(45deg, var(--yellow), var(--orange));
+    background: linear-gradient(45deg, var(--yellow), white);
     font-family: var(--font-main);
     color: var(--text-main);
     display: flex;
@@ -131,11 +131,11 @@ th {
 }
 
 td {
-    background-color: var(--primary);
+    background-color: lightgreen;
     border:2px solid black;
     padding: 6px;
     text-align:center;
-    color: var(--yellow);
+    color: var(--text-main);
     text-shadow: 0 0 6px #fff700, 0 0 10px #ff6f1a; /* Glow effect */
 }
 
