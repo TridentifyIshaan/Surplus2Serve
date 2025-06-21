@@ -1,0 +1,3 @@
+1. Categorize the commodity because we are using categorical data.
+2. Check the random forest application, if there is need for any type of encoding.
+3. Pear plot or some other graph checks the correlation between all the factors, remove those if there's any problem.
