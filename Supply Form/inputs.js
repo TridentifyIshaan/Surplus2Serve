@@ -41,14 +41,27 @@ document.getElementById('quantity').addEventListener('input', function (e) {
     this.value = this.value.replace(/[^0-9]/g, '');
 });
 
-// Location with coordinates
+// Location with coordinates and reverse geocoding
 document.getElementById('gps-btn').addEventListener('click', function() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
-            // Optionally, use a reverse geocoding API here to get the address
-            document.getElementById('address').value = `Lat: ${lat}, Lon: ${lon}`;
+
+            // Use Nominatim reverse geocoding API
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.display_name) {
+                        document.getElementById('address').value = data.display_name;
+                    } else {
+                        document.getElementById('address').value = `Lat: ${lat}, Lon: ${lon}`;
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('address').value = `Lat: ${lat}, Lon: ${lon}`;
+                });
+                
         }, function(error) {
             alert('Unable to retrieve your location.');
         });
