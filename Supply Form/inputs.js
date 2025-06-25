@@ -41,7 +41,7 @@ document.getElementById('quantity').addEventListener('input', function (e) {
     this.value = this.value.replace(/[^0-9]/g, '');
 });
 
-// Location with coordinates and reverse geocoding
+// Location with coordinates and reverse geocoding using Nominatim API
 document.getElementById('gps-btn').addEventListener('click', function() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
