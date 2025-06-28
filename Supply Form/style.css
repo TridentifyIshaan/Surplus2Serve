@@ -1,0 +1,156 @@
+:root {
+    --primary: #43b043;
+    --primary-dark: #2e7d32;
+    --yellow: #fff700;
+    --orange: #ff6f1a;
+    --footer-bg: #f5d7b2;
+    --card-bg: #fffbe6;
+    --text-main: #222;
+    --text-accent: #ff6f1a;
+    --nav-bg: rgba(255,255,255,0.7);
+    --shadow: 0 4px 24px rgba(0,0,0,0.10);
+    --radius: 18px;
+    --font-main: 'Inter', 'Quicksand', Arial, sans-serif;
+}
+
+body {
+    background: linear-gradient(45deg, var(--yellow), var(--orange));
+    font-family: 'Quicksand', Arial, sans-serif;
+    margin: 20px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.form-container {
+    background: var(--card-bg);
+    border-radius: 18px;
+    outline: 2px solid var(--primary-dark);
+    box-shadow: 0 4px 24px var(--shadow, rgba(0,0,0,0.07));
+    padding: 32px 24px;
+    max-width: 420px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 auto;
+    /* Center the form horizontally */
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+h2 {
+    text-align: center;
+    color: var(--primary-dark);
+    margin-bottom: 18px;
+}
+label {
+    display: block;
+    margin-top: 0;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 1rem;
+}
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1.5px solid var(--primary);
+    background: #fff;
+    font-size: 1em;
+    margin-bottom: 20px;
+    margin-top: 0;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: var(--orange);
+    outline: none;
+}
+textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+.submit-btn {
+    width: 100%;
+    background: var(--orange);
+    color: var(--text-main);
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 0;
+    font-size: 1.1em;
+    margin-top: 18px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.submit-btn:hover {
+    background: var(--yellow);
+}
+.required {
+    color: var(--text-accent);
+}
+
+.address-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin-bottom: 20px;
+}
+
+.address-row input[type="text"] {
+    flex: 1 1 auto;
+    margin-bottom: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none; /* Remove double border between input and button */
+}
+
+.address-row .gps-btn {
+    background: #fff;
+    border: 1.5px solid var(--primary);
+    border-left: none; /* Remove double border between input and button */
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: 0 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    transition: border-color 0.2s, background 0.2s;
+    margin-left: 0;
+    box-sizing: border-box;
+}
+
+.address-row .gps-btn:hover {
+    border-color: var(--orange);
+    background: var(--yellow);
+}
+
+/* Responsive fix for address row on small screens */
+@media (max-width: 500px) {
+    .address-row {
+        flex-direction: row;
+    }
+    .address-row input[type="text"] {
+        font-size: 0.95em;
+        padding: 7px;
+    }
+    .address-row .gps-btn {
+        padding: 0 10px;
+    }
+}
+
+@media (max-width: 500px) {
+    .form-container {
+        padding: 14px 2vw;
+        max-width: 100vw;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px var(--shadow, rgba(0,0,0,0.10));
+    }
+    input, select, textarea {
+        margin-bottom: 14px;
+        padding: 7px;
+    }
+}
