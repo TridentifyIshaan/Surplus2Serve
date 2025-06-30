@@ -1,2 +1,3 @@
 *.pkl
 *.pkl
+Model/produce_spoilage_baseline_model.pkl
