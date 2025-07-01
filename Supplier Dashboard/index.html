@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Supplier Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Horizontal Navbar -->
+    <nav class="navbar">
+        <span class="dashboard-title">Supplier Dashboard</span>
+        <button id="add-product-btn" class="add-product-btn">Add New Surplus Product</button>
+        <span class="profile-icon" title="Profile">👤</span>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div id="supply-form" class="hidden">
+            <!-- Supply form will be injected here -->
+        </div>
+
+        <section class="submitted-products-box">
+            <h2>Submitted Products</h2>
+            <ul id="submitted-products-list">
+                <!-- List of submitted forms will be displayed here -->
+            </ul>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
