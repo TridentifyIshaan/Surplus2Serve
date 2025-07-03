@@ -12,10 +12,15 @@
     <main>
         <section class="search-section">
             <input type="text" id="search-bar" placeholder="Search crop...">
-            <input type="number" id="quantity-filter" placeholder="Min Quantity">
+            <input type="number" id="quantity-filter" placeholder="Min Quantity" min="0" step="1">
             <select id="sort-by">
                 <option value="name">Sort by Name</option>
                 <option value="spoilage">Sort by Spoilage Rate</option>
                 <option value="shelf">Sort by Shelf Life</option>
             </select>
             <button id="search-btn">Search</button>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

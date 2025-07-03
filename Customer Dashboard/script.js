@@ -81,5 +81,39 @@ function searchCrops() {
 
 document.getElementById('search-btn').addEventListener('click', searchCrops);
 
+// Only allow letters and space for crop search
+document.getElementById('search-bar').addEventListener('keydown', function(e) {
+    if (
+        !(
+            (e.key >= 'a' && e.key <= 'z') ||
+            (e.key >= 'A' && e.key <= 'Z') ||
+            e.key === ' ' ||
+            e.key === 'Backspace' ||
+            e.key === 'Delete' ||
+            e.key === 'ArrowLeft' ||
+            e.key === 'ArrowRight' ||
+            e.key === 'Tab'
+        )
+    ) {
+        e.preventDefault();
+    }
+});
+
+// Only allow numbers for quantity filter
+document.getElementById('quantity-filter').addEventListener('keydown', function(e) {
+    if (
+        !(
+            (e.key >= '0' && e.key <= '9') ||
+            e.key === 'Backspace' ||
+            e.key === 'Delete' ||
+            e.key === 'ArrowLeft' ||
+            e.key === 'ArrowRight' ||
+            e.key === 'Tab'
+        )
+    ) {
+        e.preventDefault();
+    }
+});
+
 // Initial render
 renderResults(crops);

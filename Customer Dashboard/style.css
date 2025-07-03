@@ -43,7 +43,7 @@ body {
 }
 
 .search-section button {
-    background: var(--orange);
+    background: var(--primary);
     color: #fff;
     border: none;
     font-weight: bold;
