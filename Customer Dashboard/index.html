@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <span class="dashboard-title">Customer Dashboard</span>
+    </nav>
+    <main>
+        <section class="search-section">
+            <input type="text" id="search-bar" placeholder="Search crop...">
+            <input type="number" id="quantity-filter" placeholder="Min Quantity">
+            <select id="sort-by">
+                <option value="name">Sort by Name</option>
+                <option value="spoilage">Sort by Spoilage Rate</option>
+                <option value="shelf">Sort by Shelf Life</option>
+            </select>
+            <button id="search-btn">Search</button>
