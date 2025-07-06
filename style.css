@@ -11,6 +11,29 @@
     --shadow: 0 4px 24px rgba(0,0,0,0.10);
     --radius: 18px;
     --font-main: 'Inter', 'Quicksand', Arial, sans-serif;
+    --sdg-gradient: linear-gradient(
+        90deg,
+        #e5243b, /* Red */
+        #dda63a, /* Orange */
+        #4c9f38, /* Green */
+        #c5192d, /* Dark Red */
+        #ff3a21, /* Bright Orange */
+        #26bde2, /* Light Blue */
+        #fcc30b, /* Yellow */
+        #a21942, /* Burgundy */
+        #fd6925, /* Coral */
+        #dd1367, /* Pink */
+        #00689d, /* Blue */
+        #19486a, /* Navy */
+        #8f1838, /* Maroon */
+        #fdb713, /* Gold */
+        #3f7e44, /* Forest Green */
+        #0a97d9, /* Cyan */
+        #56c02b, /* Lime Green */
+        #00689d, /* Blue */
+        #e4b343, /* Light Gold */
+        #c5192d /* Dark Red */
+    );
 }
 
 * {
@@ -121,27 +144,72 @@ nav ul li a:hover, nav ul li a:focus {
     animation: gradient-move 3s linear infinite;
 }
 
-th {
-    background-color: var(--primary-dark);
-    border:2px solid black;
-    padding: 6px;
-    text-align:center;
+.SDG {
+    text-align: center;
+    margin: 48px auto;
+    padding: 32px 24px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 4px solid var(--primary-dark);
+    max-width: 900px;
+}
+
+.SDG h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 24px;
+    font-family: var(--font-main);
+}
+
+.SDG h1 span {
     color: var(--orange);
-    text-shadow: 0 0 12px #ff6f1a; /* Glow effect */
+    font-family: var(--font-main);
+    background: var(--sdg-gradient);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-move 5s linear infinite;
 }
 
-td {
-    background-color: lightgreen;
-    border:2px solid black;
-    padding: 6px;
-    text-align:center;
+.SDG p {
+    font-size: 1.2rem;
     color: var(--text-main);
-    text-shadow: 0 0 6px #fff700, 0 0 10px #ff6f1a; /* Glow effect */
+    margin: 16px auto;
+    line-height: 1.6;
+    max-width: 800px;
 }
 
-@keyframes gradient-move {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 200% 50%; }
+.SDG img {
+    width: 100%;
+    max-width: 400px; /* Limit the maximum width */
+    height: auto; /* Maintain aspect ratio */
+    margin: 16px auto;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.SDG .banner img {
+    max-width: 800px; /* Larger size for the banner */
+}
+
+.SDG .static-images img,
+.SDG .animated-images img {
+    max-width: 300px; /* Smaller size for static and animated images */
+}
+
+.SDG .animated-images img {
+    border-radius: 0px; /* No border radius for animated images */
+}
+
+.SDG .static-images,
+.SDG .animated-images {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
 /* Optional: subtle floating animation for the hero section */
@@ -222,6 +290,11 @@ td {
     margin-bottom: 0;
 }
 
+@keyframes gradient-move {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
 /* FLOATING ACTION BUTTON */
 .fab {
     position: fixed;
@@ -270,19 +343,30 @@ footer {
 /* Make table horizontally scrollable on small screens */
 .grid {
     width: 100%;
-    overflow-x: auto;
+    overflow-x: auto; /* Allow horizontal scrolling for smaller screens */
     margin-top: 24px;
 }
 
 .grid table {
-    min-width: 900px;
-    border-collapse: collapse;
     width: 100%;
+    border-collapse: collapse; /* Remove gaps between table cells */
+    text-align: left;
 }
 
-th, td {
-    min-width: 120px;
-    word-break: break-word;
+.grid th, .grid td {
+    padding: 8px 12px;
+    font-size: 1rem;
+    color: var(--text-main);
+    border-bottom: 1px solid #ddd; /* Add a subtle border between rows */
+}
+
+.grid th {
+    font-weight: bold;
+    color: var(--primary-dark);
+}
+
+.grid td {
+    font-weight: normal;
 }
 
 /* Responsive adjustments */
@@ -344,5 +428,27 @@ th, td {
     th, td {
         min-width: 90px;
         padding: 4px;
+    }
+}
+
+@media (max-width: 768px) {
+    .SDG h1 {
+        font-size: 1.8rem;
+    }
+
+    .SDG p {
+        font-size: 1rem;
+    }
+
+    .SDG img {
+        max-width: 90%; /* Scale images for smaller screens */
+    }
+
+    .grid table {
+        font-size: 0.9rem; /* Reduce font size for smaller screens */
+    }
+
+    .grid th, .grid td {
+        padding: 6px 8px; /* Adjust padding for smaller screens */
     }
 }
