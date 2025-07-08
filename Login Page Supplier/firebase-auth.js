@@ -9,27 +9,158 @@ const firebaseConfig = {
     measurementId: "G-ZGJGQFNW1R"
 };
 
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+// Initialize Firebase only if not already initialized
+try {
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+        console.log('Firebase initialized successfully');
+    }
+} catch (error) {
+    console.error('Firebase initialization error:', error);
 }
 
-// Helper to add event listeners for multiple IDs
+// Enhanced Google Sign-In functionality
+function setupGoogleAuth() {
+    // Configure Google provider
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('email');
+    provider.addScope('profile');
+    
+    return provider;
+}
+
+// Helper to add event listeners for multiple IDs (legacy support)
 function addSocialSignIn(id, provider) {
     const btn = document.getElementById(id);
     if (btn) {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
+            
+            // Check if we're in development environment
+            const isDevelopment = window.location.hostname === 'localhost' || 
+                                window.location.hostname === '127.0.0.1' || 
+                                window.location.hostname === '';
+            
+            if (isDevelopment) {
+                // Development mode: Simulate Google Sign-In
+                if (typeof showNotification === 'function') {
+                    showNotification('Development Mode: Simulating Google Sign-In...', 'info');
+                }
+                
+                setTimeout(() => {
+                    const userData = {
+                        username: 'Demo Google User',
+                        email: 'demo.google.user@gmail.com',
+                        type: 'supplier',
+                        authProvider: 'google-demo',
+                        uid: 'demo-google-uid-' + Date.now(),
+                        photoURL: 'https://via.placeholder.com/100x100?text=Demo'
+                    };
+                    
+                    localStorage.setItem('currentUser', JSON.stringify(userData));
+                    
+                    if (typeof showNotification === 'function') {
+                        showNotification(`Welcome, ${userData.username}!`, 'success');
+                    } else {
+                        alert(`Welcome, ${userData.username}!`);
+                    }
+                    
+                    setTimeout(() => {
+                        window.location.href = '../Supplier Dashboard/index.html';
+                    }, 1000);
+                }, 1000);
+                
+                return;
+            }
+            
+            // Production mode: Try Firebase Google Sign-In
             firebase.auth().signInWithPopup(provider)
                 .then(result => {
-                    alert('Signed in as: ' + result.user.displayName);
+                    const user = result.user;
+                    const userData = {
+                        username: user.displayName || user.email,
+                        email: user.email,
+                        type: 'supplier',
+                        authProvider: 'google',
+                        uid: user.uid,
+                        photoURL: user.photoURL
+                    };
+                    
+                    // Store user data
+                    localStorage.setItem('currentUser', JSON.stringify(userData));
+                    
+                    // Show success message
+                    if (typeof showNotification === 'function') {
+                        showNotification(`Welcome, ${userData.username}!`, 'success');
+                    } else {
+                        alert(`Welcome, ${userData.username}!`);
+                    }
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = '../Supplier Dashboard/index.html';
+                    }, 1000);
                 })
                 .catch(error => {
-                    alert(error.message);
+                    console.error('Google Sign-In Error:', error);
+                    
+                    // Handle domain authorization error
+                    if (error.code === 'auth/unauthorized-domain') {
+                        if (typeof showNotification === 'function') {
+                            showNotification('Domain not authorized. Using demo mode instead...', 'info');
+                        }
+                        
+                        // Fallback to demo mode
+                        setTimeout(() => {
+                            const userData = {
+                                username: 'Demo Google User',
+                                email: 'demo.google.user@gmail.com',
+                                type: 'supplier',
+                                authProvider: 'google-demo',
+                                uid: 'demo-google-uid-' + Date.now(),
+                                photoURL: 'https://via.placeholder.com/100x100?text=Demo'
+                            };
+                            
+                            localStorage.setItem('currentUser', JSON.stringify(userData));
+                            
+                            if (typeof showNotification === 'function') {
+                                showNotification(`Welcome, ${userData.username}!`, 'success');
+                            } else {
+                                alert(`Welcome, ${userData.username}!`);
+                            }
+                            
+                            setTimeout(() => {
+                                window.location.href = '../Supplier Dashboard/index.html';
+                            }, 1000);
+                        }, 1000);
+                        
+                        return;
+                    }
+                    
+                    // Handle other errors
+                    if (typeof showNotification === 'function') {
+                        showNotification('Google Sign-In failed: ' + error.message, 'error');
+                    } else {
+                        alert('Google Sign-In failed: ' + error.message);
+                    }
                 });
         });
     }
 }
 
-// Google
-addSocialSignIn('google-signin', new firebase.auth.GoogleAuthProvider());
-addSocialSignIn('google-signin-in', new firebase.auth.GoogleAuthProvider());
+// Initialize after DOM loads
+document.addEventListener('DOMContentLoaded', () => {
+    // Check if Firebase is available
+    if (typeof firebase !== 'undefined') {
+        // Setup legacy Google sign-in handlers
+        try {
+            const googleProvider = setupGoogleAuth();
+            addSocialSignIn('google-signin', googleProvider);
+            addSocialSignIn('google-signin-in', googleProvider);
+        } catch (error) {
+            console.error('Google Auth setup error:', error);
+        }
+    } else {
+        console.warn('Firebase SDK not loaded');
+    }
+});

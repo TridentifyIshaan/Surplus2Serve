@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surplus2Serve Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.warning { background: #fff3cd; color: #856404; }
+        .test-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-btn:hover { background: #0056b3; }
+        .test-btn:disabled { background: #6c757d; cursor: not-allowed; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔬 Surplus2Serve Integration Test</h1>
+    
+    <div class="test-container">
+        <h2>Backend Connection Test</h2>
+        <div id="connection-status" class="status warning">Testing connection...</div>
+        <button class="test-btn" onclick="testConnection()">Test Connection</button>
+    </div>
+
+    <div class="test-container">
+        <h2>API Endpoints Test</h2>
+        <div id="endpoints-status" class="status warning">Click to test endpoints...</div>
+        <button class="test-btn" onclick="testEndpoints()">Test All Endpoints</button>
+        <div id="endpoints-details"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Prediction Test</h2>
+        <div id="prediction-status" class="status warning">Ready to test prediction...</div>
+        <button class="test-btn" onclick="testPrediction()">Test Prediction</button>
+        <div id="prediction-results"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Model Information</h2>
+        <div id="model-status" class="status warning">Click to load model info...</div>
+        <button class="test-btn" onclick="testModelInfo()">Get Model Info</button>
+        <div id="model-details"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Integration Status</h2>
+        <div id="integration-status" class="status warning">Run all tests to see integration status</div>
+        <button class="test-btn" onclick="runAllTests()">Run All Tests</button>
+    </div>
+
+    <!-- Include API client -->
+    <script src="api-client.js"></script>
+    
+    <script>
+        let testResults = {
+            connection: false,
+            endpoints: false,
+            prediction: false,
+            modelInfo: false
+        };
+
+        async function testConnection() {
+            const statusDiv = document.getElementById('connection-status');
+            statusDiv.textContent = 'Testing connection...';
+            statusDiv.className = 'status warning';
+
+            try {
+                const connection = await window.spoilageAPI.validateConnection();
+                
+                if (connection.connected) {
+                    statusDiv.textContent = `✅ Connected! Model status: ${connection.modelStatus}`;
+                    statusDiv.className = 'status success';
+                    testResults.connection = true;
+                } else {
+                    statusDiv.textContent = `❌ Connection failed: ${connection.error}`;
+                    statusDiv.className = 'status error';
+                    testResults.connection = false;
+                }
+            } catch (error) {
+                statusDiv.textContent = `❌ Connection error: ${error.message}`;
+                statusDiv.className = 'status error';
+                testResults.connection = false;
+            }
+        }
+
+        async function testEndpoints() {
+            const statusDiv = document.getElementById('endpoints-status');
+            const detailsDiv = document.getElementById('endpoints-details');
+            
+            statusDiv.textContent = 'Testing endpoints...';
+            statusDiv.className = 'status warning';
+            
+            const endpoints = [
+                { name: 'Health Check', method: 'healthCheck' },
+                { name: 'Commodities', method: 'getCommodities' },
+                { name: 'Model Info', method: 'getModelInfo' }
+            ];
+
+            let results = [];
+            let allPassed = true;
+
+            for (const endpoint of endpoints) {
+                try {
+                    const result = await window.spoilageAPI[endpoint.method]();
+                    results.push(`✅ ${endpoint.name}: OK`);
+                } catch (error) {
+                    results.push(`❌ ${endpoint.name}: ${error.message}`);
+                    allPassed = false;
+                }
+            }
+
+            statusDiv.textContent = allPassed ? '✅ All endpoints working' : '⚠️ Some endpoints failed';
+            statusDiv.className = allPassed ? 'status success' : 'status warning';
+            
+            detailsDiv.innerHTML = `<pre>${results.join('\n')}</pre>`;
+            testResults.endpoints = allPassed;
+        }
+
+        async function testPrediction() {
+            const statusDiv = document.getElementById('prediction-status');
+            const resultsDiv = document.getElementById('prediction-results');
+            
+            statusDiv.textContent = 'Testing prediction...';
+            statusDiv.className = 'status warning';
+
+            const testData = {
+                Commodity_name: "Tomato",
+                Temperature: 25.0,
+                Humidity: 75.0,
+                Storage_Type: "cold_storage",
+                Days_Since_Harvest: 3
+            };
+
+            try {
+                const result = await window.spoilageAPI.predictSpoilage(testData);
+                
+                statusDiv.textContent = '✅ Prediction successful';
+                statusDiv.className = 'status success';
+                
+                resultsDiv.innerHTML = `
+                    <h4>Prediction Results:</h4>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                `;
+                
+                testResults.prediction = true;
+            } catch (error) {
+                statusDiv.textContent = `❌ Prediction failed: ${error.message}`;
+                statusDiv.className = 'status error';
+                
+                resultsDiv.innerHTML = `<pre>Error: ${error.message}</pre>`;
+                testResults.prediction = false;
+            }
+        }
+
+        async function testModelInfo() {
+            const statusDiv = document.getElementById('model-status');
+            const detailsDiv = document.getElementById('model-details');
+            
+            statusDiv.textContent = 'Loading model info...';
+            statusDiv.className = 'status warning';
+
+            try {
+                const info = await window.spoilageAPI.getModelInfo();
+                
+                statusDiv.textContent = '✅ Model info loaded';
+                statusDiv.className = 'status success';
+                
+                detailsDiv.innerHTML = `
+                    <h4>Model Information:</h4>
+                    <pre>${JSON.stringify(info, null, 2)}</pre>
+                `;
+                
+                testResults.modelInfo = true;
+            } catch (error) {
+                statusDiv.textContent = `❌ Failed to load model info: ${error.message}`;
+                statusDiv.className = 'status error';
+                
+                detailsDiv.innerHTML = `<pre>Error: ${error.message}</pre>`;
+                testResults.modelInfo = false;
+            }
+        }
+
+        async function runAllTests() {
+            const statusDiv = document.getElementById('integration-status');
+            statusDiv.textContent = 'Running all tests...';
+            statusDiv.className = 'status warning';
+
+            await testConnection();
+            await testEndpoints();
+            await testPrediction();
+            await testModelInfo();
+
+            const passedTests = Object.values(testResults).filter(Boolean).length;
+            const totalTests = Object.keys(testResults).length;
+
+            if (passedTests === totalTests) {
+                statusDiv.textContent = `🎉 All tests passed! Integration is working perfectly.`;
+                statusDiv.className = 'status success';
+            } else {
+                statusDiv.textContent = `⚠️ ${passedTests}/${totalTests} tests passed. Check individual test results.`;
+                statusDiv.className = 'status warning';
+            }
+        }
+
+        // Auto-run connection test on page load
+        window.addEventListener('load', () => {
+            setTimeout(testConnection, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -2,23 +2,226 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Customer Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard - Surplus2Serve (Blue-Orange Theme)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav class="navbar">
-        <span class="dashboard-title">Customer Dashboard</span>
-    </nav>
-    <main>
-        <section class="search-section">
-            <input type="text" id="search-bar" placeholder="Search crop...">
-            <input type="number" id="quantity-filter" placeholder="Min Quantity" min="0" step="1">
-            <select id="sort-by">
-                <option value="name">Sort by Name</option>
-                <option value="spoilage">Sort by Spoilage Rate</option>
-                <option value="shelf">Sort by Shelf Life</option>
-            </select>
-            <button id="search-btn">Search</button>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="nav-brand">
+                <span class="material-symbols-outlined">eco</span>
+                <span class="brand-text">Surplus2Serve</span>
+            </div>
+            <div class="nav-user">
+                <a href="../index.html" class="back-link">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Home
+                </a>
+                <div class="user-profile">
+                    <div class="profile-dropdown">
+                        <button class="profile-btn" id="profile-btn">
+                            <span class="material-symbols-outlined">account_circle</span>
+                            <span class="profile-name" id="profile-name">Customer Dashboard</span>
+                            <span class="material-symbols-outlined">expand_more</span>
+                        </button>
+                        <div class="profile-menu hidden" id="profile-menu">
+                            <div class="profile-header">
+                                <div class="profile-avatar">
+                                    <span class="material-symbols-outlined">person</span>
+                                </div>
+                                <div class="profile-info">
+                                    <p class="profile-email" id="profile-email">guest@example.com</p>
+                                    <p class="profile-role">Customer</p>
+                                </div>
+                            </div>
+                            <div class="profile-actions">
+                                <button class="profile-action" id="edit-profile-btn">
+                                    <span class="material-symbols-outlined">edit</span>
+                                    Edit Profile
+                                </button>
+                                <button class="profile-action" id="settings-btn">
+                                    <span class="material-symbols-outlined">settings</span>
+                                    Settings
+                                </button>
+                                <button class="profile-action" id="notifications-btn">
+                                    <span class="material-symbols-outlined">notifications</span>
+                                    Notifications
+                                </button>
+                                <div class="profile-divider"></div>
+                                <button class="profile-action signin-btn" id="signin-btn">
+                                    <span class="material-symbols-outlined">login</span>
+                                    Sign In
+                                </button>
+                                <button class="profile-action signout-btn hidden" id="signout-btn">
+                                    <span class="material-symbols-outlined">logout</span>
+                                    Sign Out
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- Dashboard Overview -->
+        <section class="dashboard-overview">
+            <div class="overview-cards">
+                <div class="overview-card">
+                    <div class="card-icon">
+                        <span class="material-symbols-outlined">inventory_2</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>Available Products</h3>
+                        <p class="stat-number" id="total-products">350</p>
+                        <p class="stat-label">Total items</p>
+                    </div>
+                </div>
+                <div class="overview-card">
+                    <div class="card-icon warning">
+                        <span class="material-symbols-outlined">warning</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>High Risk Items</h3>
+                        <p class="stat-number warning" id="high-risk">24</p>
+                        <p class="stat-label">Need attention</p>
+                    </div>
+                </div>
+                <div class="overview-card">
+                    <div class="card-icon success">
+                        <span class="material-symbols-outlined">eco</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>Food Saved</h3>
+                        <p class="stat-number success" id="food-saved">2.8t</p>
+                        <p class="stat-label">This month</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Spoilage Prediction Tool -->
+        <section class="prediction-section">
+            <div class="section-header">
+                <h2><span class="material-symbols-outlined">psychology</span> AI Spoilage Prediction</h2>
+                <p>Predict spoilage risk for your produce using our advanced ML model</p>
+            </div>
+            
+            <div class="prediction-container">
+                <form id="prediction-form" class="prediction-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="commodity">Commodity Name</label>
+                            <select id="commodity" name="commodity" required>
+                                <option value="">Select commodity...</option>
+                                <option value="tomato">Tomato</option>
+                                <option value="potato">Potato</option>
+                                <option value="onion">Onion</option>
+                                <option value="apple">Apple</option>
+                                <option value="banana">Banana</option>
+                                <option value="carrot">Carrot</option>
+                                <option value="lettuce">Lettuce</option>
+                                <option value="mango">Mango</option>
+                                <option value="orange">Orange</option>
+                                <option value="cucumber">Cucumber</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="temperature">Temperature (°C)</label>
+                            <input type="number" id="temperature" name="temperature" min="-10" max="50" step="0.1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="humidity">Humidity (%)</label>
+                            <input type="number" id="humidity" name="humidity" min="0" max="100" step="1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="days-harvest">Days Since Harvest</label>
+                            <input type="number" id="days-harvest" name="days-harvest" min="0" max="365" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="storage-type">Storage Type</label>
+                            <select id="storage-type" name="storage-type" required>
+                                <option value="cold_storage">Cold Storage</option>
+                                <option value="ambient">Ambient</option>
+                                <option value="controlled_atmosphere">Controlled Atmosphere</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="transport-duration">Transport Duration (hrs)</label>
+                            <input type="number" id="transport-duration" name="transport-duration" min="0" max="168" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="predict-btn" id="predict-btn">
+                        <span class="material-symbols-outlined">analytics</span>
+                        Predict Spoilage Risk
+                    </button>
+                </form>
+                
+                <div id="prediction-result" class="prediction-result hidden">
+                    <div class="result-header">
+                        <h3>Prediction Result</h3>
+                    </div>
+                    <div class="result-content">
+                        <div class="risk-meter">
+                            <div class="risk-value" id="risk-percentage">0%</div>
+                            <div class="risk-bar">
+                                <div class="risk-fill" id="risk-fill"></div>
+                            </div>
+                            <div class="risk-label" id="risk-label">Low Risk</div>
+                        </div>
+                        <div class="recommendations" id="recommendations">
+                            <!-- Recommendations will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Search & Browse -->
+        <section class="browse-section">
+            <div class="section-header">
+                <h2><span class="material-symbols-outlined">search</span> Browse Available Products</h2>
+                <p>Search and filter products from our network of suppliers</p>
+            </div>
+            
+            <div class="search-controls">
+                <div class="search-bar">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" id="search-input" placeholder="Search by product name...">
+                </div>
+                <div class="filter-group">
+                    <select id="location-filter">
+                        <option value="">All Locations</option>
+                        <option value="Delhi">Delhi</option>
+                        <option value="Punjab">Punjab</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Karnataka">Karnataka</option>
+                    </select>
+                    <input type="number" id="quantity-filter" placeholder="Min quantity" min="0">
+                    <select id="sort-filter">
+                        <option value="">Sort by...</option>
+                        <option value="name">Name</option>
+                        <option value="spoilage">Spoilage Risk</option>
+                        <option value="shelf">Shelf Life</option>
+                        <option value="quantity">Quantity</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="products-grid" id="products-grid">
+                <!-- Products will be populated by JavaScript -->
+            </div>
         </section>
     </main>
     <script src="script.js"></script>
