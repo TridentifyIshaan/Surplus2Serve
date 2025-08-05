@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Update Test - Surplus2Serve</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .status-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #007bff;
+        }
+        .success { border-left-color: #28a745; background: #d4edda; }
+        .warning { border-left-color: #ffc107; background: #fff3cd; }
+        .error { border-left-color: #dc3545; background: #f8d7da; }
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-weight: 500;
+            transition: transform 0.2s;
+        }
+        button:hover { transform: translateY(-2px); }
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            display: inline-block;
+            padding: 12px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .nav-links a:hover { background: #0056b3; }
+        .profile-info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .profile-info h4 {
+            margin: 0 0 10px 0;
+            color: #0056b3;
+        }
+        code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔐 Profile Update Test - Surplus2Serve</h1>
+        <p>This page tests if the Firebase authentication profile data is properly updating in both dashboards.</p>
+        
+        <div class="status-card" id="auth-status">
+            <h3>🔍 Authentication Status</h3>
+            <div id="auth-info">Checking authentication...</div>
+        </div>
+
+        <div class="test-container">
+            <h2>📋 Test Results</h2>
+            <div id="test-results"></div>
+            <button onclick="runProfileTests()">🧪 Run Profile Tests</button>
+            <button onclick="clearUserData()">🗑️ Clear User Data</button>
+            <button onclick="simulateFirebaseUser()">👤 Simulate Firebase User</button>
+        </div>
+
+        <div class="nav-links">
+            <a href="Login Page Customer/index.html">🏛️ Customer Login</a>
+            <a href="Login Page Supplier/index.html">🚜 Supplier Login</a>
+            <a href="Customer Dashboard/index.html">📊 Customer Dashboard</a>
+            <a href="Supplier Dashboard/index.html">📈 Supplier Dashboard</a>
+        </div>
+
+        <div class="test-container">
+            <h2>🔧 Profile Update Fix Summary</h2>
+            <div class="status-card success">
+                <h4>✅ Fixed Issues:</h4>
+                <ul>
+                    <li><strong>Customer Dashboard:</strong> Updated to use <code>currentUser</code> localStorage key</li>
+                    <li><strong>Supplier Dashboard:</strong> Updated to use <code>currentUser</code> localStorage key</li>
+                    <li><strong>Firebase Integration:</strong> Both dashboards now check Firebase auth state first</li>
+                    <li><strong>Profile Display:</strong> Properly shows Firebase user data (displayName, email)</li>
+                    <li><strong>Sign Out:</strong> Uses Firebase auth module for proper sign out</li>
+                    <li><strong>Auto-redirect:</strong> Redirects to appropriate login page after sign out</li>
+                </ul>
+            </div>
+            
+            <div class="status-card warning">
+                <h4>⚡ Updated Functions:</h4>
+                <ul>
+                    <li><code>loadUserProfile()</code> - Checks Firebase auth first, then localStorage</li>
+                    <li><code>updateUserProfile()</code> - Handles Firebase user data structure</li>
+                    <li><code>handleSignOut()</code> - Uses Firebase auth module for sign out</li>
+                    <li><code>initializeAuth()</code> - Called on dashboard load</li>
+                </ul>
+            </div>
+
+            <div class="status-card">
+                <h4>🔑 Firebase Auth Data Structure:</h4>
+                <pre>
+{
+  uid: "firebase-user-id",
+  email: "user@example.com", 
+  displayName: "User Name",
+  photoURL: "profile-photo-url",
+  emailVerified: true,
+  authProvider: "google" | "email",
+  signInTime: "2025-08-05T12:00:00.000Z"
+}
+                </pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Auth Module -->
+    <script src="shared/firebase-auth-module.js"></script>
+    
+    <script>
+        function checkAuthenticationStatus() {
+            const authInfo = document.getElementById('auth-info');
+            const authStatus = document.getElementById('auth-status');
+            
+            if (window.FirebaseAuth) {
+                if (window.FirebaseAuth.isAuthenticated()) {
+                    const userData = window.FirebaseAuth.getStoredUserData();
+                    authStatus.className = 'status-card success';
+                    authInfo.innerHTML = `
+                        <div class="profile-info">
+                            <h4>🔐 Authenticated User</h4>
+                            <p><strong>Email:</strong> ${userData.email || 'N/A'}</p>
+                            <p><strong>Display Name:</strong> ${userData.displayName || userData.username || 'N/A'}</p>
+                            <p><strong>UID:</strong> ${userData.uid || 'N/A'}</p>
+                            <p><strong>Auth Provider:</strong> ${userData.authProvider || 'N/A'}</p>
+                            <p><strong>User Type:</strong> ${userData.type || 'N/A'}</p>
+                        </div>
+                    `;
+                } else {
+                    authStatus.className = 'status-card warning';
+                    authInfo.innerHTML = '<p>❌ No authenticated user found</p>';
+                }
+            } else {
+                authStatus.className = 'status-card error';
+                authInfo.innerHTML = '<p>❌ Firebase Auth Module not loaded</p>';
+            }
+        }
+
+        function runProfileTests() {
+            const results = document.getElementById('test-results');
+            let testResults = '';
+
+            // Test 1: localStorage key
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                testResults += '<div class="status-card success">✅ Test 1: currentUser key found in localStorage</div>';
+                try {
+                    const userData = JSON.parse(currentUser);
+                    testResults += `<div class="status-card">📄 User Data: ${JSON.stringify(userData, null, 2)}</div>`;
+                } catch (e) {
+                    testResults += '<div class="status-card error">❌ Test 1: Invalid JSON in currentUser</div>';
+                }
+            } else {
+                testResults += '<div class="status-card warning">⚠️ Test 1: No currentUser found in localStorage</div>';
+            }
+
+            // Test 2: Firebase auth module
+            if (window.FirebaseAuth) {
+                testResults += '<div class="status-card success">✅ Test 2: Firebase Auth Module loaded</div>';
+                
+                if (window.FirebaseAuth.isAuthenticated()) {
+                    testResults += '<div class="status-card success">✅ Test 3: User is authenticated via Firebase</div>';
+                } else {
+                    testResults += '<div class="status-card warning">⚠️ Test 3: No Firebase authentication</div>';
+                }
+            } else {
+                testResults += '<div class="status-card error">❌ Test 2: Firebase Auth Module not available</div>';
+            }
+
+            // Test 3: Old localStorage keys (should not exist)
+            const oldCustomerKey = localStorage.getItem('surplus2serve_customer');
+            const oldSupplierKey = localStorage.getItem('surplus2serve_user');
+            
+            if (!oldCustomerKey && !oldSupplierKey) {
+                testResults += '<div class="status-card success">✅ Test 4: Old localStorage keys cleaned up</div>';
+            } else {
+                testResults += '<div class="status-card warning">⚠️ Test 4: Found old localStorage keys (should be cleaned)</div>';
+            }
+
+            results.innerHTML = testResults;
+        }
+
+        function clearUserData() {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('surplus2serve_customer');
+            localStorage.removeItem('surplus2serve_user');
+            
+            if (window.FirebaseAuth && window.FirebaseAuth.signOut) {
+                window.FirebaseAuth.signOut();
+            }
+            
+            window.FirebaseAuth.showNotification('All user data cleared!', 'success');
+            setTimeout(() => {
+                checkAuthenticationStatus();
+                runProfileTests();
+            }, 1000);
+        }
+
+        function simulateFirebaseUser() {
+            const mockUser = {
+                uid: 'test-firebase-uid-' + Date.now(),
+                email: 'test.user@firebase.com',
+                displayName: 'Test Firebase User',
+                photoURL: null,
+                emailVerified: true,
+                authProvider: 'email',
+                signInTime: new Date().toISOString(),
+                type: 'customer'
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(mockUser));
+            localStorage.setItem('isAuthenticated', 'true');
+            
+            window.FirebaseAuth.showNotification('Mock Firebase user created!', 'success');
+            setTimeout(() => {
+                checkAuthenticationStatus();
+                runProfileTests();
+            }, 1000);
+        }
+
+        // Auto-run tests on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                checkAuthenticationStatus();
+                runProfileTests();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

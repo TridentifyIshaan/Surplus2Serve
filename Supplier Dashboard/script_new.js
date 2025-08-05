@@ -2,7 +2,18 @@
 // Modern JavaScript for Supplier Dashboard functionality
 
 class SupplierDashboard {
-    constructor() {
+    co        this.updateUserProfile(user);
+        
+        // Debug information
+        console.log('🔍 Loading user profile:', user);
+        
+        // If no user is found, log it
+        if (!user) {
+            console.log('⚠️ No authenticated user found for supplier dashboard');
+        } else {
+            console.log('✅ User found for supplier dashboard:', user.email || user.username);
+        }
+    }or() {
         this.products = [
             {
                 id: 1,
@@ -88,12 +99,39 @@ class SupplierDashboard {
         });
 
         // Profile dropdown events
-        document.getElementById('profile-btn').addEventListener('click', () => this.toggleProfileMenu());
-        document.getElementById('signin-btn').addEventListener('click', () => this.handleSignIn());
-        document.getElementById('signout-btn').addEventListener('click', () => this.handleSignOut());
-        document.getElementById('edit-profile-btn').addEventListener('click', () => this.editProfile());
-        document.getElementById('settings-btn').addEventListener('click', () => this.openSettings());
-        document.getElementById('notifications-btn').addEventListener('click', () => this.openNotifications());
+        const profileBtn = document.getElementById('profile-btn');
+        const signinBtn = document.getElementById('signin-btn');
+        const signoutBtn = document.getElementById('signout-btn');
+        const editProfileBtn = document.getElementById('edit-profile-btn');
+        const settingsBtn = document.getElementById('settings-btn');
+        const notificationsBtn = document.getElementById('notifications-btn');
+
+        if (profileBtn) {
+            profileBtn.addEventListener('click', () => this.toggleProfileMenu());
+            console.log('✅ Profile button event listener added');
+        } else {
+            console.error('❌ Profile button not found');
+        }
+
+        if (signinBtn) {
+            signinBtn.addEventListener('click', () => this.handleSignIn());
+        }
+
+        if (signoutBtn) {
+            signoutBtn.addEventListener('click', () => this.handleSignOut());
+        }
+
+        if (editProfileBtn) {
+            editProfileBtn.addEventListener('click', () => this.editProfile());
+        }
+
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', () => this.openSettings());
+        }
+
+        if (notificationsBtn) {
+            notificationsBtn.addEventListener('click', () => this.openNotifications());
+        }
 
         // Close profile menu when clicking outside
         document.addEventListener('click', (e) => {
@@ -104,13 +142,29 @@ class SupplierDashboard {
     }
 
     initializeAuth() {
-        // Check if user is already signed in (from localStorage or session)
-        const savedUser = localStorage.getItem('surplus2serve_user');
-        if (savedUser) {
-            const user = JSON.parse(savedUser);
-            this.updateUserProfile(user);
+        this.loadUserProfile();
+    }
+
+    loadUserProfile() {
+        // Try to get user data from Firebase auth module first
+        let user = null;
+        
+        // Check if Firebase auth module is available and user is authenticated
+        if (window.FirebaseAuth && window.FirebaseAuth.isAuthenticated()) {
+            user = window.FirebaseAuth.getStoredUserData();
         } else {
-            this.updateUserProfile(null);
+            // Fallback to localStorage for demo users
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                user = JSON.parse(currentUser);
+            }
+        }
+        
+        this.updateUserProfile(user);
+        
+        // If no user is found, redirect to login
+        if (!user) {
+            console.log('No authenticated user found for supplier dashboard');
         }
     }
 
@@ -118,8 +172,18 @@ class SupplierDashboard {
         const profileBtn = document.getElementById('profile-btn');
         const profileMenu = document.getElementById('profile-menu');
         
-        profileBtn.classList.toggle('active');
-        profileMenu.classList.toggle('hidden');
+        console.log('🔍 Toggle profile menu - Elements found:', {
+            profileBtn: !!profileBtn,
+            profileMenu: !!profileMenu
+        });
+        
+        if (profileBtn && profileMenu) {
+            profileBtn.classList.toggle('active');
+            profileMenu.classList.toggle('hidden');
+            console.log('✅ Profile menu toggled');
+        } else {
+            console.error('❌ Profile menu elements not found');
+        }
     }
 
     closeProfileMenu() {
@@ -136,11 +200,28 @@ class SupplierDashboard {
     }
 
     handleSignOut() {
-        // Clear user data
-        localStorage.removeItem('surplus2serve_user');
-        this.updateUserProfile(null);
-        this.closeProfileMenu();
-        this.showNotification('Successfully signed out!', 'success');
+        // Use Firebase auth module if available
+        if (window.FirebaseAuth && window.FirebaseAuth.signOut) {
+            window.FirebaseAuth.signOut().then(() => {
+                this.updateUserProfile(null);
+                this.closeProfileMenu();
+                this.showNotification('Successfully signed out!', 'success');
+                // Redirect to login page
+                setTimeout(() => {
+                    window.location.href = '../Login Page Supplier/index.html';
+                }, 1500);
+            }).catch((error) => {
+                console.error('Sign out error:', error);
+                this.showNotification('Sign out failed. Please try again.', 'error');
+            });
+        } else {
+            // Fallback for demo users
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('isAuthenticated');
+            this.updateUserProfile(null);
+            this.closeProfileMenu();
+            this.showNotification('Successfully signed out!', 'success');
+        }
     }
 
     updateUserProfile(user) {
@@ -149,16 +230,34 @@ class SupplierDashboard {
         const signinBtn = document.getElementById('signin-btn');
         const signoutBtn = document.getElementById('signout-btn');
 
+        console.log('🔍 Profile elements found:', {
+            profileName: !!profileName,
+            profileEmail: !!profileEmail,
+            signinBtn: !!signinBtn,
+            signoutBtn: !!signoutBtn
+        });
+
         if (user) {
-            profileName.textContent = user.username || user.email || 'Supplier';
-            profileEmail.textContent = user.email || 'supplier@example.com';
-            signinBtn.classList.add('hidden');
-            signoutBtn.classList.remove('hidden');
+            // Handle Firebase user data structure
+            const displayName = user.displayName || user.username || user.email?.split('@')[0] || 'Supplier';
+            const email = user.email || 'supplier@example.com';
+            
+            if (profileName) profileName.textContent = displayName;
+            if (profileEmail) profileEmail.textContent = email;
+            
+            if (signinBtn) signinBtn.classList.add('hidden');
+            if (signoutBtn) signoutBtn.classList.remove('hidden');
+            
+            console.log('✅ Supplier profile updated:', { displayName, email });
         } else {
-            profileName.textContent = 'Guest User';
-            profileEmail.textContent = 'guest@example.com';
-            signinBtn.classList.remove('hidden');
-            signoutBtn.classList.add('hidden');
+            if (profileName) profileName.textContent = 'Guest User';
+            if (profileEmail) profileEmail.textContent = 'guest@example.com';
+            
+            if (signinBtn) signinBtn.classList.remove('hidden');
+            if (signoutBtn) signoutBtn.classList.add('hidden');
+```
+            
+            console.log('👤 Profile set to guest mode');
         }
     }
 
@@ -459,14 +558,30 @@ class SupplierDashboard {
         e.preventDefault();
         
         const formData = new FormData(e.target);
-        const data = {
-            commodity: formData.get('commodity'),
-            temperature: parseFloat(formData.get('temperature')),
-            humidity: parseFloat(formData.get('humidity')),
-            daysSinceHarvest: parseInt(formData.get('days-harvest')),
-            storageType: formData.get('storage-type'),
-            transportDuration: parseFloat(formData.get('transport-duration'))
+        
+        // Map form values to API expected values
+        const storageTypeMapping = {
+            'cold_storage': 'cold_storage',
+            'ambient': 'room_temperature', 
+            'controlled_atmosphere': 'cold_storage' // Treat as enhanced cold storage
         };
+        
+        const rawStorageType = formData.get('storage-type');
+        const mappedStorageType = storageTypeMapping[rawStorageType] || 'room_temperature';
+        
+        const data = {
+            Commodity_name: formData.get('commodity'),
+            Temperature: parseFloat(formData.get('temperature')),
+            Humidity: parseFloat(formData.get('humidity')),
+            Days_Since_Harvest: parseInt(formData.get('days-harvest')),
+            Storage_Type: mappedStorageType,
+            Transport_Duration: parseFloat(formData.get('transport-duration')),
+            Packaging_Quality: 'good', // Default value
+            Month_num: new Date().getMonth() + 1, // Current month
+            Location: 'Delhi' // Default location
+        };
+
+        console.log('Sending prediction data:', data); // Debug log
 
         // Show loading state
         const predictBtn = document.getElementById('predict-btn');
@@ -475,21 +590,48 @@ class SupplierDashboard {
         predictBtn.disabled = true;
 
         try {
-            // Try to use the actual ML model API first
-            let prediction;
-            try {
-                prediction = await this.callMLModelAPI(data);
-            } catch (apiError) {
-                console.log('ML API unavailable, using fallback prediction:', apiError.message);
-                // Fallback to local calculation
-                prediction = this.calculateSpoilageRisk(data);
+            // Call actual ML model API
+            const response = await fetch('http://localhost:8000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const errorDetails = await response.text();
+                console.error('API Error Details:', errorDetails);
+                throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorDetails}`);
             }
+
+            const prediction = await response.json();
+            console.log('Received prediction:', prediction); // Debug log
             
-            this.displayPredictionResult(prediction);
-            this.showNotification('Prediction completed successfully!', 'success');
+            this.displayPredictionResult({
+                riskScore: Math.round(prediction.Spoilage_Risk_Score * 100),
+                commodity: prediction.Input_Summary.commodity,
+                recommendations: this.generateRecommendationsFromAPI(prediction),
+                confidence: Math.round(prediction.Confidence * 100),
+                modelVersion: prediction.Model_Version,
+                shelfLife: prediction.Estimated_Shelf_Life
+            });
+            this.showNotification('✅ ML Prediction completed successfully!', 'success');
         } catch (error) {
-            console.error('Prediction error:', error);
-            this.showNotification('Prediction failed. Please try again.', 'error');
+            console.error('Prediction API Error:', error);
+            
+            // Fallback to demo calculation if API fails
+            this.showNotification('⚠️ API unavailable. Using fallback prediction...', 'warning');
+            const fallbackData = {
+                commodity: formData.get('commodity'),
+                temperature: parseFloat(formData.get('temperature')),
+                humidity: parseFloat(formData.get('humidity')),
+                daysSinceHarvest: parseInt(formData.get('days-harvest')),
+                storageType: formData.get('storage-type'),
+                transportDuration: parseFloat(formData.get('transport-duration'))
+            };
+            const prediction = this.calculateSpoilageRisk(fallbackData);
+            this.displayPredictionResult(prediction);
         } finally {
             // Restore button
             predictBtn.innerHTML = originalText;
@@ -643,6 +785,50 @@ class SupplierDashboard {
 
         if (data.transportDuration > 24) {
             recommendations.push("🚛 Long transport duration detected - consider local markets first.");
+        }
+
+        return recommendations;
+    }
+
+    generateRecommendationsFromAPI(prediction) {
+        const recommendations = [];
+        const riskScore = prediction.Spoilage_Risk_Score * 100;
+        
+        // Risk-based recommendations for suppliers
+        if (prediction.Risk_Interpretation === 'High Risk') {
+            recommendations.push("🚨 HIGH SPOILAGE RISK! Immediate action required.");
+            recommendations.push("💨 Emergency sale, processing, or donation recommended.");
+            recommendations.push("📢 Market as 'quick sale' with discounted pricing.");
+            recommendations.push("🧊 Implement maximum cold chain protocols.");
+        } else if (prediction.Risk_Interpretation === 'Medium Risk') {
+            recommendations.push("⚡ Medium risk detected - prioritize for distribution.");
+            recommendations.push("🚚 Expedite transportation to reduce storage time.");
+            recommendations.push("📦 Consider upgrading storage conditions.");
+            recommendations.push("💰 Standard pricing with quick turnover strategy.");
+        } else {
+            recommendations.push("✅ Low spoilage risk - product is in excellent condition.");
+            recommendations.push("📈 Suitable for extended storage or long-distance transport.");
+            recommendations.push("💰 Premium pricing recommended for high-quality produce.");
+            recommendations.push("🌟 Market as premium quality items.");
+        }
+
+        // Add shelf life information
+        if (prediction.Estimated_Shelf_Life) {
+            recommendations.push(`📅 Estimated shelf life: ${prediction.Estimated_Shelf_Life} days`);
+        }
+
+        // Add model confidence for supplier decision making
+        if (prediction.Confidence) {
+            const confidence = Math.round(prediction.Confidence * 100);
+            recommendations.push(`🎯 Model confidence: ${confidence}%`);
+            if (confidence < 70) {
+                recommendations.push("⚠️ Lower confidence - consider additional quality checks.");
+            }
+        }
+
+        // Add business insights
+        if (prediction.Model_Version) {
+            recommendations.push(`🤖 Prediction powered by ML Model ${prediction.Model_Version}`);
         }
 
         return recommendations;

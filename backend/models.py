@@ -2,7 +2,7 @@
 Pydantic models for request/response validation in the Surplus2Serve API.
 """
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from typing import Optional, Dict, Any
 
 class PredictionRequest(BaseModel):
@@ -102,6 +102,9 @@ class PredictionRequest(BaseModel):
         return v
 class PredictionResponse(BaseModel):
     """Response model for spoilage risk prediction."""
+    
+    model_config = ConfigDict(protected_namespaces=())
+    
     Spoilage_Risk_Score: float = Field(
         ...,
         description="Spoilage risk score (0.0 - 1.0, higher means more risk)",
@@ -209,6 +212,8 @@ class APISettings(BaseModel):
     
 class ModelInfo(BaseModel):
     """Model information response."""
+    
+    model_config = ConfigDict(protected_namespaces=())
     
     model_type: str = Field(..., description="Type of ML model")
     model_loaded: bool = Field(..., description="Whether model is loaded")

@@ -257,14 +257,30 @@ class CustomerDashboard {
         e.preventDefault();
         
         const formData = new FormData(e.target);
-        const data = {
-            commodity: formData.get('commodity'),
-            temperature: parseFloat(formData.get('temperature')),
-            humidity: parseFloat(formData.get('humidity')),
-            daysSinceHarvest: parseInt(formData.get('days-harvest')),
-            storageType: formData.get('storage-type'),
-            transportDuration: parseFloat(formData.get('transport-duration'))
+        
+        // Map form values to API expected values
+        const storageTypeMapping = {
+            'cold_storage': 'cold_storage',
+            'ambient': 'room_temperature', 
+            'controlled_atmosphere': 'cold_storage' // Treat as enhanced cold storage
         };
+        
+        const rawStorageType = formData.get('storage-type');
+        const mappedStorageType = storageTypeMapping[rawStorageType] || 'room_temperature';
+        
+        const data = {
+            Commodity_name: formData.get('commodity'),
+            Temperature: parseFloat(formData.get('temperature')),
+            Humidity: parseFloat(formData.get('humidity')),
+            Days_Since_Harvest: parseInt(formData.get('days-harvest')),
+            Storage_Type: mappedStorageType,
+            Transport_Duration: parseFloat(formData.get('transport-duration')),
+            Packaging_Quality: 'good', // Default value
+            Month_num: new Date().getMonth() + 1, // Current month
+            Location: 'Delhi' // Default location
+        };
+
+        console.log('Sending prediction data:', data); // Debug log
 
         // Show loading state
         const predictBtn = document.getElementById('predict-btn');
@@ -273,12 +289,47 @@ class CustomerDashboard {
         predictBtn.disabled = true;
 
         try {
-            // Simulate API call with realistic prediction
-            await this.delay(2000);
-            const prediction = this.calculateSpoilageRisk(data);
-            this.displayPredictionResult(prediction);
+            // Call actual ML model API
+            const response = await fetch('http://localhost:8000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const errorDetails = await response.text();
+                console.error('API Error Details:', errorDetails);
+                throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorDetails}`);
+            }
+
+            const prediction = await response.json();
+            console.log('Received prediction:', prediction); // Debug log
+            
+            this.displayPredictionResult({
+                riskScore: Math.round(prediction.Spoilage_Risk_Score * 100),
+                commodity: prediction.Input_Summary.commodity,
+                recommendations: this.generateRecommendationsFromAPI(prediction),
+                confidence: Math.round(prediction.Confidence * 100),
+                modelVersion: prediction.Model_Version,
+                shelfLife: prediction.Estimated_Shelf_Life
+            });
         } catch (error) {
-            this.showNotification('Prediction failed. Please try again.', 'error');
+            console.error('Prediction API Error:', error);
+            
+            // Fallback to demo calculation if API fails
+            this.showNotification('API unavailable. Using fallback prediction...', 'warning');
+            const fallbackData = {
+                commodity: formData.get('commodity'),
+                temperature: parseFloat(formData.get('temperature')),
+                humidity: parseFloat(formData.get('humidity')),
+                daysSinceHarvest: parseInt(formData.get('days-harvest')),
+                storageType: formData.get('storage-type'),
+                transportDuration: parseFloat(formData.get('transport-duration'))
+            };
+            const prediction = this.calculateSpoilageRisk(fallbackData);
+            this.displayPredictionResult(prediction);
         } finally {
             // Restore button
             predictBtn.innerHTML = originalText;
@@ -360,6 +411,39 @@ class CustomerDashboard {
 
         if (data.daysSinceHarvest > 7) {
             recommendations.push("📅 Product has been stored for extended period - prioritize sale.");
+        }
+
+        return recommendations;
+    }
+
+    generateRecommendationsFromAPI(prediction) {
+        const recommendations = [];
+        const riskScore = prediction.Spoilage_Risk_Score * 100;
+        
+        // Risk-based recommendations
+        if (prediction.Risk_Interpretation === 'High Risk') {
+            recommendations.push("🚨 HIGH SPOILAGE RISK! Immediate action required.");
+            recommendations.push("💨 Consider emergency sale, processing, or donation.");
+            recommendations.push("🧊 Implement maximum cold chain protocols.");
+        } else if (prediction.Risk_Interpretation === 'Medium Risk') {
+            recommendations.push("⚡ Medium risk detected - monitor conditions closely.");
+            recommendations.push("📦 Consider upgrading storage conditions.");
+            recommendations.push("🕒 Prioritize this batch for early distribution.");
+        } else {
+            recommendations.push("✅ Low spoilage risk - product is in good condition.");
+            recommendations.push("📈 Suitable for extended storage or long-distance transport.");
+            recommendations.push("💚 Optimal conditions maintained.");
+        }
+
+        // Add shelf life information
+        if (prediction.Estimated_Shelf_Life) {
+            recommendations.push(`📅 Estimated shelf life: ${prediction.Estimated_Shelf_Life} days`);
+        }
+
+        // Add confidence information
+        if (prediction.Confidence) {
+            const confidence = Math.round(prediction.Confidence * 100);
+            recommendations.push(`🎯 Model confidence: ${confidence}%`);
         }
 
         return recommendations;

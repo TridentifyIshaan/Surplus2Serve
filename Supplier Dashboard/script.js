@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Initialize profile management
+    initializeProfile();
+    
     const addBtn = document.getElementById('add-product-btn');
     const formDiv = document.getElementById('supply-form');
     const submittedList = document.getElementById('submitted-products-list');
@@ -222,3 +225,191 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     });
 });
+
+// Profile Management Functions
+function initializeProfile() {
+    loadUserProfile();
+    setupProfileEventListeners();
+}
+
+function loadUserProfile() {
+    // Try to get user data from Firebase auth module first
+    let user = null;
+    
+    // Check if Firebase auth module is available and user is authenticated
+    if (window.FirebaseAuth && window.FirebaseAuth.isAuthenticated()) {
+        user = window.FirebaseAuth.getStoredUserData();
+    } else {
+        // Fallback to localStorage for demo users
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+            user = JSON.parse(currentUser);
+        }
+    }
+    
+    updateUserProfile(user);
+    
+    // If no user is found, redirect to login
+    if (!user) {
+        console.log('No authenticated user found for supplier dashboard');
+    }
+}
+
+function updateUserProfile(user) {
+    const profileName = document.getElementById('profile-name');
+    const profileEmail = document.getElementById('profile-email');
+    const signinBtn = document.getElementById('signin-btn');
+    const signoutBtn = document.getElementById('signout-btn');
+
+    if (user) {
+        // Handle Firebase user data structure
+        const displayName = user.displayName || user.username || user.email?.split('@')[0] || 'Supplier';
+        const email = user.email || 'supplier@example.com';
+        
+        profileName.textContent = displayName;
+        profileEmail.textContent = email;
+        
+        if (signinBtn) signinBtn.classList.add('hidden');
+        if (signoutBtn) signoutBtn.classList.remove('hidden');
+        
+        console.log('✅ Supplier profile updated:', { displayName, email });
+    } else {
+        profileName.textContent = 'Guest User';
+        profileEmail.textContent = 'guest@example.com';
+        
+        if (signinBtn) signinBtn.classList.remove('hidden');
+        if (signoutBtn) signoutBtn.classList.add('hidden');
+        
+        console.log('👤 Profile set to guest mode');
+    }
+}
+
+function setupProfileEventListeners() {
+    // Profile dropdown toggle
+    const profileBtn = document.getElementById('profile-btn');
+    const profileMenu = document.getElementById('profile-menu');
+    
+    if (profileBtn && profileMenu) {
+        profileBtn.addEventListener('click', () => {
+            profileBtn.classList.toggle('active');
+            profileMenu.classList.toggle('hidden');
+        });
+
+        // Close profile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.profile-dropdown')) {
+                profileBtn.classList.remove('active');
+                profileMenu.classList.add('hidden');
+            }
+        });
+    }
+
+    // Sign in button
+    const signinBtn = document.getElementById('signin-btn');
+    if (signinBtn) {
+        signinBtn.addEventListener('click', () => {
+            window.location.href = '../Login Page Supplier/index.html';
+        });
+    }
+
+    // Sign out button
+    const signoutBtn = document.getElementById('signout-btn');
+    if (signoutBtn) {
+        signoutBtn.addEventListener('click', handleSignOut);
+    }
+
+    // Profile action buttons
+    const editProfileBtn = document.getElementById('edit-profile-btn');
+    if (editProfileBtn) {
+        editProfileBtn.addEventListener('click', () => {
+            closeProfileMenu();
+            showNotification('Profile editing feature coming soon!', 'info');
+        });
+    }
+
+    const settingsBtn = document.getElementById('settings-btn');
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', () => {
+            closeProfileMenu();
+            showNotification('Settings page coming soon!', 'info');
+        });
+    }
+
+    const notificationsBtn = document.getElementById('notifications-btn');
+    if (notificationsBtn) {
+        notificationsBtn.addEventListener('click', () => {
+            closeProfileMenu();
+            showNotification('Notifications feature coming soon!', 'info');
+        });
+    }
+}
+
+function handleSignOut() {
+    // Use Firebase auth module if available
+    if (window.FirebaseAuth && window.FirebaseAuth.signOut) {
+        window.FirebaseAuth.signOut().then(() => {
+            updateUserProfile(null);
+            closeProfileMenu();
+            showNotification('Successfully signed out!', 'success');
+            // Redirect to login page
+            setTimeout(() => {
+                window.location.href = '../Login Page Supplier/index.html';
+            }, 1500);
+        }).catch((error) => {
+            console.error('Sign out error:', error);
+            showNotification('Sign out failed. Please try again.', 'error');
+        });
+    } else {
+        // Fallback for demo users
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('isAuthenticated');
+        updateUserProfile(null);
+        closeProfileMenu();
+        showNotification('Successfully signed out!', 'success');
+    }
+}
+
+function closeProfileMenu() {
+    const profileBtn = document.getElementById('profile-btn');
+    const profileMenu = document.getElementById('profile-menu');
+    
+    if (profileBtn) profileBtn.classList.remove('active');
+    if (profileMenu) profileMenu.classList.add('hidden');
+}
+
+function showNotification(message, type = 'info', duration = 3000) {
+    // Use Firebase auth module notification if available
+    if (window.FirebaseAuth && window.FirebaseAuth.showNotification) {
+        window.FirebaseAuth.showNotification(message, type, duration);
+        return;
+    }
+
+    // Fallback notification system
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()">×</button>
+    `;
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+        background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, duration);
+};

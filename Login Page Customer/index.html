@@ -14,6 +14,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
     
+    <!-- Firebase Auth Module -->
+    <script src="../shared/firebase-auth-module.js"></script>
+    
     <title>NGO / Food Bank Portal - Surplus2Serve</title>
 </head>
 <body>
@@ -66,10 +69,10 @@
                         <p class="form-subtitle">Welcome back! Please enter your details.</p>
                         
                         <div class="input-group">
-                            <label for="signin-username">Organization Name</label>
+                            <label for="signin-email">Email Address</label>
                             <div class="input-field">
-                                <i class="fas fa-building"></i>
-                                <input type="text" id="signin-username" name="username" placeholder="Enter your organization name" required>
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="signin-email" name="email" placeholder="Enter your email address" required>
                             </div>
                         </div>
 
@@ -79,6 +82,14 @@
                                 <i class="fas fa-lock"></i>
                                 <input type="password" id="signin-password" name="password" placeholder="Enter your password" required>
                             </div>
+                        </div>
+
+                        <div class="form-options">
+                            <div class="remember-me">
+                                <input type="checkbox" id="remember-me" name="remember">
+                                <label for="remember-me">Remember me</label>
+                            </div>
+                            <a href="#" class="forgot-password" id="forgot-password-link">Forgot password?</a>
                         </div>
 
                         <button type="submit" class="auth-btn primary">
@@ -157,9 +168,6 @@
         </div>
     </div>
 
-    <script src="../main-integration.js"></script>
-    <script src="./firebase-auth.js"></script>
-    <script src="./app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const signinForm = document.getElementById('signin-form');
@@ -189,120 +197,186 @@
             });
 
             // Google Sign-In functionality
-            function handleGoogleAuth(e) {
+            async function handleGoogleAuth(e) {
                 e.preventDefault();
-                showNotification('Connecting to Google...', 'info');
+                window.FirebaseAuth.showNotification('Connecting to Google...', 'info');
                 
-                setTimeout(() => {
-                    const userData = {
-                        username: 'Demo Google NGO',
-                        email: 'demo.google.ngo@gmail.com',
-                        type: 'customer',
-                        authProvider: 'google-demo',
-                        uid: 'demo-google-uid-' + Date.now(),
-                        photoURL: 'https://via.placeholder.com/100x100?text=NGO'
-                    };
-                    
-                    localStorage.setItem('currentUser', JSON.stringify(userData));
-                    showNotification(`Welcome, ${userData.username}!`, 'success');
-                    
-                    setTimeout(() => {
-                        window.location.href = '../Customer Dashboard/index.html';
-                    }, 1000);
-                }, 1000);
+                try {
+                    const result = await window.FirebaseAuth.signInWithGoogle();
+                    if (result.success) {
+                        window.FirebaseAuth.showNotification(result.message, 'success');
+                        
+                        // Store user type for Customer Dashboard
+                        const userData = window.FirebaseAuth.getStoredUserData();
+                        if (userData) {
+                            userData.type = 'customer';
+                            localStorage.setItem('currentUser', JSON.stringify(userData));
+                        }
+                        
+                        setTimeout(() => {
+                            window.location.href = '../Customer Dashboard/index.html';
+                        }, 1500);
+                    } else {
+                        window.FirebaseAuth.showNotification(result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Google Auth Error:', error);
+                    window.FirebaseAuth.showNotification('Google Sign-In failed. Please try again.', 'error');
+                }
             }
 
-            // Demo login functionality
+            // Demo login functionality (fallback)
             document.getElementById('demo-login').addEventListener('click', (e) => {
                 e.preventDefault();
                 const demoUser = {
                     username: 'Demo NGO Organization',
+                    email: 'demo@ngo.org',
                     type: 'customer',
-                    email: 'demo@ngo.org'
+                    authProvider: 'demo',
+                    uid: 'demo-customer-' + Date.now()
                 };
                 
                 localStorage.setItem('currentUser', JSON.stringify(demoUser));
-                showNotification('Demo login successful!', 'success');
+                localStorage.setItem('isAuthenticated', 'true');
+                window.FirebaseAuth.showNotification('Demo login successful!', 'success');
                 
                 setTimeout(() => {
                     window.location.href = '../Customer Dashboard/index.html';
                 }, 1000);
+            });
+
+            // Handle sign-in form submission
+            signinForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData(signinForm);
+                const email = formData.get('email');
+                const password = formData.get('password');
+
+                if (!email || !password) {
+                    window.FirebaseAuth.showNotification('Please fill in all fields', 'error');
+                    return;
+                }
+
+                // Show loading state
+                const submitBtn = signinForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+                submitBtn.disabled = true;
+
+                try {
+                    const result = await window.FirebaseAuth.signInWithEmail(email, password);
+                    if (result.success) {
+                        // Store user type for Customer Dashboard
+                        const userData = window.FirebaseAuth.getStoredUserData();
+                        if (userData) {
+                            userData.type = 'customer';
+                            localStorage.setItem('currentUser', JSON.stringify(userData));
+                        }
+                        
+                        window.FirebaseAuth.showNotification(result.message, 'success');
+                        setTimeout(() => {
+                            window.location.href = '../Customer Dashboard/index.html';
+                        }, 1500);
+                    } else {
+                        window.FirebaseAuth.showNotification(result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Sign in error:', error);
+                    window.FirebaseAuth.showNotification('Sign in failed. Please try again.', 'error');
+                } finally {
+                    // Restore button state
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            });
+
+            // Handle sign-up form submission
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData(signupForm);
+                const username = formData.get('username');
+                const email = formData.get('email');
+                const password = formData.get('password');
+
+                if (!username || !email || !password) {
+                    window.FirebaseAuth.showNotification('Please fill in all fields', 'error');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    window.FirebaseAuth.showNotification('Password must be at least 6 characters long', 'error');
+                    return;
+                }
+
+                // Show loading state
+                const submitBtn = signupForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+                submitBtn.disabled = true;
+
+                try {
+                    const result = await window.FirebaseAuth.signUpWithEmail(email, password, username);
+                    if (result.success) {
+                        // Store user type for Customer Dashboard
+                        const userData = window.FirebaseAuth.getStoredUserData();
+                        if (userData) {
+                            userData.type = 'customer';
+                            userData.username = username;
+                            localStorage.setItem('currentUser', JSON.stringify(userData));
+                        }
+                        
+                        window.FirebaseAuth.showNotification(result.message, 'success');
+                        setTimeout(() => {
+                            window.location.href = '../Customer Dashboard/index.html';
+                        }, 2000);
+                    } else {
+                        window.FirebaseAuth.showNotification(result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Sign up error:', error);
+                    window.FirebaseAuth.showNotification('Account creation failed. Please try again.', 'error');
+                } finally {
+                    // Restore button state
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            });
+
+            // Forgot password functionality
+            document.getElementById('forgot-password-link').addEventListener('click', async (e) => {
+                e.preventDefault();
+                
+                const email = document.getElementById('signin-email').value;
+                if (!email) {
+                    window.FirebaseAuth.showNotification('Please enter your email address first', 'warning');
+                    return;
+                }
+
+                try {
+                    const result = await window.FirebaseAuth.resetPassword(email);
+                    if (result.success) {
+                        window.FirebaseAuth.showNotification(result.message, 'success');
+                    } else {
+                        window.FirebaseAuth.showNotification(result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Password reset error:', error);
+                    window.FirebaseAuth.showNotification('Failed to send password reset email', 'error');
+                }
             });
 
             // Google sign-in/up event listeners
             document.getElementById('google-signin').addEventListener('click', handleGoogleAuth);
             document.getElementById('google-signup').addEventListener('click', handleGoogleAuth);
 
-            // Handle sign-in form submission
-            signinForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                const formData = new FormData(signinForm);
-                const credentials = {
-                    username: formData.get('username'),
-                    password: formData.get('password'),
-                    type: 'customer'
-                };
-
-                if (!credentials.username || !credentials.password) {
-                    showNotification('Please fill in all fields', 'error');
-                    return;
-                }
-
-                localStorage.setItem('currentUser', JSON.stringify(credentials));
-                showNotification(`Welcome back, ${credentials.username}!`, 'success');
-                
-                setTimeout(() => {
-                    window.location.href = '../Customer Dashboard/index.html';
-                }, 1000);
-            });
-
-            // Handle sign-up form submission
-            signupForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                const formData = new FormData(signupForm);
-                const userData = {
-                    username: formData.get('username'),
-                    email: formData.get('email'),
-                    password: formData.get('password'),
-                    type: 'customer'
-                };
-
-                if (!userData.username || !userData.email || !userData.password) {
-                    showNotification('Please fill in all fields', 'error');
-                    return;
-                }
-
-                localStorage.setItem('currentUser', JSON.stringify(userData));
-                showNotification(`Account created successfully! Welcome, ${userData.username}!`, 'success');
-                
-                setTimeout(() => {
-                    window.location.href = '../Customer Dashboard/index.html';
-                }, 1000);
-            });
+            // Check if user is already authenticated
+            if (window.FirebaseAuth && window.FirebaseAuth.isAuthenticated()) {
+                console.log('User already authenticated, redirecting...');
+                window.location.href = '../Customer Dashboard/index.html';
+            }
         });
-
-        // Notification function
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-                <span>${message}</span>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 100);
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
     </script>
 </body>
 </html>

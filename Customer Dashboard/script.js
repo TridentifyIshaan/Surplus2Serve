@@ -117,13 +117,31 @@ class CustomerDashboard {
     }
 
     initializeAuth() {
-        // Check if user is already signed in (from localStorage or session)
-        const savedUser = localStorage.getItem('surplus2serve_customer');
-        if (savedUser) {
-            const user = JSON.parse(savedUser);
-            this.updateUserProfile(user);
+        // Check if user is authenticated using Firebase auth data
+        this.loadUserProfile();
+    }
+
+    loadUserProfile() {
+        // Try to get user data from Firebase auth module first
+        let user = null;
+        
+        // Check if Firebase auth module is available and user is authenticated
+        if (window.FirebaseAuth && window.FirebaseAuth.isAuthenticated()) {
+            user = window.FirebaseAuth.getStoredUserData();
         } else {
-            this.updateUserProfile(null);
+            // Fallback to localStorage for demo users
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                user = JSON.parse(currentUser);
+            }
+        }
+        
+        this.updateUserProfile(user);
+        
+        // If no user is found, redirect to login
+        if (!user) {
+            console.log('No authenticated user found');
+            // Optionally redirect to login or show guest state
         }
     }
 
@@ -149,11 +167,28 @@ class CustomerDashboard {
     }
 
     handleSignOut() {
-        // Clear user data
-        localStorage.removeItem('surplus2serve_customer');
-        this.updateUserProfile(null);
-        this.closeProfileMenu();
-        this.showNotification('Successfully signed out!', 'success');
+        // Use Firebase auth module if available
+        if (window.FirebaseAuth && window.FirebaseAuth.signOut) {
+            window.FirebaseAuth.signOut().then(() => {
+                this.updateUserProfile(null);
+                this.closeProfileMenu();
+                this.showNotification('Successfully signed out!', 'success');
+                // Redirect to login page
+                setTimeout(() => {
+                    window.location.href = '../Login Page Customer/index.html';
+                }, 1500);
+            }).catch((error) => {
+                console.error('Sign out error:', error);
+                this.showNotification('Sign out failed. Please try again.', 'error');
+            });
+        } else {
+            // Fallback for demo users
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('isAuthenticated');
+            this.updateUserProfile(null);
+            this.closeProfileMenu();
+            this.showNotification('Successfully signed out!', 'success');
+        }
     }
 
     updateUserProfile(user) {
@@ -163,15 +198,25 @@ class CustomerDashboard {
         const signoutBtn = document.getElementById('signout-btn');
 
         if (user) {
-            profileName.textContent = user.username || user.email || 'Customer';
-            profileEmail.textContent = user.email || 'customer@example.com';
-            signinBtn.classList.add('hidden');
-            signoutBtn.classList.remove('hidden');
+            // Handle Firebase user data structure
+            const displayName = user.displayName || user.username || user.email?.split('@')[0] || 'Customer';
+            const email = user.email || 'customer@example.com';
+            
+            profileName.textContent = displayName;
+            profileEmail.textContent = email;
+            
+            if (signinBtn) signinBtn.classList.add('hidden');
+            if (signoutBtn) signoutBtn.classList.remove('hidden');
+            
+            console.log('✅ Customer profile updated:', { displayName, email });
         } else {
             profileName.textContent = 'Guest User';
             profileEmail.textContent = 'guest@example.com';
-            signinBtn.classList.remove('hidden');
-            signoutBtn.classList.add('hidden');
+            
+            if (signinBtn) signinBtn.classList.remove('hidden');
+            if (signoutBtn) signoutBtn.classList.add('hidden');
+            
+            console.log('👤 Profile set to guest mode');
         }
     }
 

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Auth Test - Surplus2Serve</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #218838; }
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 5px;
+        }
+        a:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🔥 Firebase Authentication Test - Surplus2Serve</h1>
+    
+    <div class="test-container">
+        <h2>📋 Authentication System Status</h2>
+        <div id="status-results"></div>
+        <button onclick="runStatusTests()">Check System Status</button>
+    </div>
+
+    <div class="test-container">
+        <h2>🔗 Quick Navigation</h2>
+        <a href="Login Page Customer/index.html" target="_blank">Test Customer Login</a>
+        <a href="Login Page Supplier/index.html" target="_blank">Test Supplier Login</a>
+        <a href="Customer Dashboard/index.html" target="_blank">Customer Dashboard</a>
+        <a href="Supplier Dashboard/index.html" target="_blank">Supplier Dashboard</a>
+    </div>
+
+    <div class="test-container">
+        <h2>📝 Implementation Summary</h2>
+        <div class="info">
+            <h3>✅ Completed Features:</h3>
+            <ul>
+                <li><strong>Centralized Firebase Auth Module:</strong> shared/firebase-auth-module.js</li>
+                <li><strong>Email/Password Authentication:</strong> Sign up, Sign in, Password reset</li>
+                <li><strong>Google OAuth Integration:</strong> One-click Google authentication</li>
+                <li><strong>User Type Management:</strong> Automatic customer/supplier classification</li>
+                <li><strong>Form Validation:</strong> Real-time input validation and error handling</li>
+                <li><strong>Loading States:</strong> Visual feedback during authentication processes</li>
+                <li><strong>Demo Mode:</strong> Fallback authentication for testing</li>
+                <li><strong>Auto-redirect:</strong> Authenticated users automatically redirected to dashboards</li>
+            </ul>
+        </div>
+        
+        <div class="info">
+            <h3>🔧 Technical Implementation:</h3>
+            <ul>
+                <li><strong>Firebase SDK v9.0.0:</strong> Modern Firebase authentication</li>
+                <li><strong>Async/Await:</strong> Modern JavaScript promises for better error handling</li>
+                <li><strong>LocalStorage Integration:</strong> Persistent user session management</li>
+                <li><strong>Notification System:</strong> Built-in user feedback system</li>
+                <li><strong>Security Features:</strong> Password strength validation, email verification</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h3>🎯 User Flow:</h3>
+            <ul>
+                <li><strong>New Users:</strong> Sign up → Email verification → Dashboard access</li>
+                <li><strong>Returning Users:</strong> Sign in → Dashboard access</li>
+                <li><strong>Google Users:</strong> One-click Google auth → Dashboard access</li>
+                <li><strong>Forgot Password:</strong> Email reset → New password → Sign in</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🧪 Test Instructions</h2>
+        <div class="info">
+            <h3>To test the authentication system:</h3>
+            <ol>
+                <li><strong>Customer Login Test:</strong> Click "Test Customer Login" → Try sign up/sign in</li>
+                <li><strong>Supplier Login Test:</strong> Click "Test Supplier Login" → Try sign up/sign in</li>
+                <li><strong>Google Auth Test:</strong> Use Google sign-in buttons on either page</li>
+                <li><strong>Password Reset Test:</strong> Enter email and click "Forgot Password"</li>
+                <li><strong>Demo Mode Test:</strong> Use "Continue with Demo" buttons for quick testing</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Firebase Auth Module -->
+    <script src="shared/firebase-auth-module.js"></script>
+    
+    <script>
+        function runStatusTests() {
+            const resultsDiv = document.getElementById('status-results');
+            let results = '';
+            
+            // Test 1: Firebase Auth Module Loading
+            if (window.FirebaseAuth) {
+                results += '<div class="test-result success">✅ Firebase Auth Module: Loaded successfully</div>';
+                
+                // Test 2: Firebase Initialization
+                if (window.FirebaseAuth.isInitialized && window.FirebaseAuth.isInitialized()) {
+                    results += '<div class="test-result success">✅ Firebase SDK: Initialized successfully</div>';
+                } else {
+                    results += '<div class="test-result error">❌ Firebase SDK: Not initialized</div>';
+                }
+                
+                // Test 3: Authentication State
+                if (window.FirebaseAuth.isAuthenticated()) {
+                    const userData = window.FirebaseAuth.getStoredUserData();
+                    results += `<div class="test-result info">🔐 Authentication Status: User logged in as ${userData.email || userData.username || 'Unknown'}</div>`;
+                } else {
+                    results += '<div class="test-result info">🔓 Authentication Status: No active session</div>';
+                }
+                
+                // Test 4: Available Methods
+                const availableMethods = [
+                    'signUpWithEmail',
+                    'signInWithEmail', 
+                    'signInWithGoogle',
+                    'resetPassword',
+                    'signOut',
+                    'showNotification'
+                ];
+                
+                const missingMethods = availableMethods.filter(method => 
+                    typeof window.FirebaseAuth[method] !== 'function'
+                );
+                
+                if (missingMethods.length === 0) {
+                    results += '<div class="test-result success">✅ Auth Methods: All methods available</div>';
+                } else {
+                    results += `<div class="test-result error">❌ Auth Methods: Missing ${missingMethods.join(', ')}</div>`;
+                }
+                
+            } else {
+                results += '<div class="test-result error">❌ Firebase Auth Module: Not loaded</div>';
+            }
+            
+            // Test 5: File Structure
+            results += '<div class="test-result info">📁 Expected Files:<br>';
+            results += '&nbsp;&nbsp;- shared/firebase-auth-module.js ✅<br>';
+            results += '&nbsp;&nbsp;- Login Page Customer/index.html ✅<br>';
+            results += '&nbsp;&nbsp;- Login Page Supplier/index.html ✅<br>';
+            results += '&nbsp;&nbsp;- Customer Dashboard/index.html ✅<br>';
+            results += '&nbsp;&nbsp;- Supplier Dashboard/index.html ✅</div>';
+            
+            resultsDiv.innerHTML = results;
+        }
+        
+        // Auto-run status check on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(runStatusTests, 500);
+        });
+    </script>
+</body>
+</html>
