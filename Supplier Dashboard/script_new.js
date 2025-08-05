@@ -78,6 +78,15 @@ class SupplierDashboard {
         document.getElementById('product-form').addEventListener('submit', (e) => this.handleAddProduct(e));
         document.getElementById('prediction-form').addEventListener('submit', (e) => this.handlePrediction(e));
 
+        // Edit modal events
+        document.getElementById('edit-product-form').addEventListener('submit', (e) => this.handleEditProduct(e));
+        document.getElementById('edit-cancel-btn').addEventListener('click', () => this.hideEditModal());
+        document.getElementById('edit-modal-overlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                this.hideEditModal();
+            }
+        });
+
         // Profile dropdown events
         document.getElementById('profile-btn').addEventListener('click', () => this.toggleProfileMenu());
         document.getElementById('signin-btn').addEventListener('click', () => this.handleSignIn());
@@ -259,7 +268,88 @@ class SupplierDashboard {
     }
 
     editProduct(productId) {
-        this.showNotification('Edit functionality coming soon!', 'info');
+        const product = this.products.find(p => p.id === productId);
+        if (!product) {
+            this.showNotification('Product not found!', 'error');
+            return;
+        }
+        
+        this.populateEditForm(product);
+        this.showEditModal();
+    }
+
+    populateEditForm(product) {
+        document.getElementById('edit-product-id').value = product.id;
+        document.getElementById('edit-product-name').value = product.name;
+        document.getElementById('edit-category').value = product.category.toLowerCase();
+        document.getElementById('edit-quantity').value = product.quantity;
+        document.getElementById('edit-location').value = product.location;
+        document.getElementById('edit-harvest-date').value = product.harvestDate;
+        document.getElementById('edit-expiry-date').value = product.expiryDate;
+        document.getElementById('edit-description').value = product.description || '';
+    }
+
+    showEditModal() {
+        const modal = document.getElementById('edit-modal-overlay');
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    hideEditModal() {
+        const modal = document.getElementById('edit-modal-overlay');
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto'; // Restore scrolling
+        document.getElementById('edit-product-form').reset();
+    }
+
+    handleEditProduct(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const productId = parseInt(formData.get('product-id'));
+        
+        // Find the product to update
+        const productIndex = this.products.findIndex(p => p.id === productId);
+        if (productIndex === -1) {
+            this.showNotification('Product not found!', 'error');
+            return;
+        }
+
+        // Update the product
+        const updatedProduct = {
+            ...this.products[productIndex],
+            name: formData.get('product-name'),
+            category: this.capitalizeFirst(formData.get('category')),
+            quantity: parseInt(formData.get('quantity')),
+            location: formData.get('location'),
+            harvestDate: formData.get('harvest-date'),
+            expiryDate: formData.get('expiry-date'),
+            description: formData.get('description'),
+            spoilageRisk: this.calculateBasicSpoilageRisk(formData.get('harvest-date'), formData.get('expiry-date'))
+        };
+
+        this.products[productIndex] = updatedProduct;
+        
+        this.updateDashboardStats();
+        this.renderProducts();
+        this.hideEditModal();
+        this.showNotification('Product updated successfully!', 'success');
+    }
+
+    calculateBasicSpoilageRisk(harvestDate, expiryDate) {
+        const now = new Date();
+        const harvest = new Date(harvestDate);
+        const expiry = new Date(expiryDate);
+        
+        const totalDays = Math.ceil((expiry - harvest) / (1000 * 60 * 60 * 24));
+        const daysElapsed = Math.ceil((now - harvest) / (1000 * 60 * 60 * 24));
+        
+        const riskPercentage = Math.max(0, Math.min(100, (daysElapsed / totalDays) * 100));
+        return Math.round(riskPercentage);
+    }
+
+    capitalizeFirst(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
     renderProducts() {

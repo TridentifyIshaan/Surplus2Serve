@@ -285,6 +285,76 @@
                 <!-- Products will be populated by JavaScript -->
             </div>
         </section>
+
+        <!-- Edit Product Modal -->
+        <div class="modal-overlay hidden" id="edit-modal-overlay">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2><span class="material-symbols-outlined">edit</span> Edit Product</h2>
+                    <button class="modal-close" id="close-edit-modal">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                
+                <div class="modal-content">
+                    <form id="edit-product-form" class="product-form">
+                        <input type="hidden" id="edit-product-id" name="product-id">
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="edit-product-name">Product Name</label>
+                                <input type="text" id="edit-product-name" name="product-name" required placeholder="e.g., Fresh Tomatoes">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="edit-category">Category</label>
+                                <select id="edit-category" name="category" required>
+                                    <option value="">Select category...</option>
+                                    <option value="vegetables">Vegetables</option>
+                                    <option value="fruits">Fruits</option>
+                                    <option value="grains">Grains</option>
+                                    <option value="dairy">Dairy</option>
+                                    <option value="processed">Processed Foods</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="edit-quantity">Quantity (kg)</label>
+                                <input type="number" id="edit-quantity" name="quantity" min="1" required placeholder="e.g., 100">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="edit-location">Location</label>
+                                <input type="text" id="edit-location" name="location" required placeholder="e.g., Delhi">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="edit-harvest-date">Harvest Date</label>
+                                <input type="date" id="edit-harvest-date" name="harvest-date" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="edit-expiry-date">Expected Expiry</label>
+                                <input type="date" id="edit-expiry-date" name="expiry-date" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="edit-description">Description</label>
+                            <textarea id="edit-description" name="description" rows="3" placeholder="Additional details about the product..."></textarea>
+                        </div>
+                        
+                        <div class="modal-actions">
+                            <button type="button" class="cancel-btn" id="cancel-edit-btn">Cancel</button>
+                            <button type="submit" class="submit-btn">
+                                <span class="material-symbols-outlined">save</span>
+                                Update Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script src="script_new.js"></script>
