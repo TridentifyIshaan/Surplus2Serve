@@ -199,12 +199,14 @@ body {
     transform: translateY(-10px);
     transition: var(--transition-normal);
     pointer-events: none;
+    visibility: hidden;
 }
 
-.profile-menu:not(.hidden) {
+.profile-menu.show {
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+    visibility: visible;
 }
 
 .profile-header {

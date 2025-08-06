@@ -2,18 +2,7 @@
 // Modern JavaScript for Supplier Dashboard functionality
 
 class SupplierDashboard {
-    co        this.updateUserProfile(user);
-        
-        // Debug information
-        console.log('🔍 Loading user profile:', user);
-        
-        // If no user is found, log it
-        if (!user) {
-            console.log('⚠️ No authenticated user found for supplier dashboard');
-        } else {
-            console.log('✅ User found for supplier dashboard:', user.email || user.username);
-        }
-    }or() {
+    constructor() {
         this.products = [
             {
                 id: 1,
@@ -70,11 +59,27 @@ class SupplierDashboard {
     }
 
     init() {
-        this.bindEvents();
-        this.updateDashboardStats();
-        this.renderProducts();
-        this.setupPredictionForm();
-        this.initializeAuth();
+        console.log('🚀 Initializing Supplier Dashboard...');
+        try {
+            this.bindEvents();
+            console.log('✅ Events bound successfully');
+            
+            this.updateDashboardStats();
+            console.log('✅ Dashboard stats updated');
+            
+            this.renderProducts();
+            console.log('✅ Products rendered');
+            
+            this.setupPredictionForm();
+            console.log('✅ Prediction form set up');
+            
+            this.initializeAuth();
+            console.log('✅ Authentication initialized');
+            
+            console.log('🎉 Dashboard initialization complete');
+        } catch (error) {
+            console.error('❌ Dashboard initialization error:', error);
+        }
     }
 
     bindEvents() {
@@ -118,7 +123,15 @@ class SupplierDashboard {
         }
 
         if (signoutBtn) {
-            signoutBtn.addEventListener('click', () => this.handleSignOut());
+            signoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🚪 Sign out button clicked - event listener triggered');
+                this.handleSignOut();
+            });
+            console.log('✅ Sign out button event listener added');
+        } else {
+            console.error('❌ Sign out button not found');
         }
 
         if (editProfileBtn) {
@@ -135,8 +148,13 @@ class SupplierDashboard {
 
         // Close profile menu when clicking outside
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.profile-dropdown')) {
-                this.closeProfileMenu();
+            const profileMenu = document.getElementById('profile-menu');
+            if (!e.target.closest('.profile-dropdown') && profileMenu) {
+                profileMenu.classList.remove('show');
+                const profileBtn = document.getElementById('profile-btn');
+                if (profileBtn) {
+                    profileBtn.classList.remove('active');
+                }
             }
         });
     }
@@ -146,25 +164,36 @@ class SupplierDashboard {
     }
 
     loadUserProfile() {
+        console.log('🔍 Loading user profile...');
         // Try to get user data from Firebase auth module first
         let user = null;
         
-        // Check if Firebase auth module is available and user is authenticated
-        if (window.FirebaseAuth && window.FirebaseAuth.isAuthenticated()) {
-            user = window.FirebaseAuth.getStoredUserData();
-        } else {
-            // Fallback to localStorage for demo users
-            const currentUser = localStorage.getItem('currentUser');
-            if (currentUser) {
-                user = JSON.parse(currentUser);
+        try {
+            // Check if Firebase auth module is available and user is authenticated
+            if (window.FirebaseAuth && window.FirebaseAuth.isAuthenticated()) {
+                console.log('🔥 Firebase auth available and user authenticated');
+                user = window.FirebaseAuth.getStoredUserData();
+                console.log('👤 Firebase user data:', user);
+            } else {
+                console.log('📦 Firebase not available, checking localStorage');
+                // Fallback to localStorage for demo users
+                const currentUser = localStorage.getItem('currentUser');
+                if (currentUser) {
+                    user = JSON.parse(currentUser);
+                    console.log('👤 localStorage user data:', user);
+                } else {
+                    console.log('👤 No user data found in localStorage');
+                }
             }
+        } catch (error) {
+            console.error('❌ Error loading user profile:', error);
         }
         
         this.updateUserProfile(user);
         
         // If no user is found, redirect to login
         if (!user) {
-            console.log('No authenticated user found for supplier dashboard');
+            console.log('⚠️ No authenticated user found for supplier dashboard');
         }
     }
 
@@ -179,8 +208,8 @@ class SupplierDashboard {
         
         if (profileBtn && profileMenu) {
             profileBtn.classList.toggle('active');
-            profileMenu.classList.toggle('hidden');
-            console.log('✅ Profile menu toggled');
+            profileMenu.classList.toggle('show');
+            console.log('✅ Profile menu toggled. Show class:', profileMenu.classList.contains('show'));
         } else {
             console.error('❌ Profile menu elements not found');
         }
@@ -190,8 +219,17 @@ class SupplierDashboard {
         const profileBtn = document.getElementById('profile-btn');
         const profileMenu = document.getElementById('profile-menu');
         
-        profileBtn.classList.remove('active');
-        profileMenu.classList.add('hidden');
+        if (profileBtn) {
+            profileBtn.classList.remove('active');
+        } else {
+            console.warn('Profile button not found when closing menu');
+        }
+        
+        if (profileMenu) {
+            profileMenu.classList.remove('show');
+        } else {
+            console.warn('Profile menu not found when closing menu');
+        }
     }
 
     handleSignIn() {
@@ -200,9 +238,13 @@ class SupplierDashboard {
     }
 
     handleSignOut() {
+        console.log('🚪 Sign out button clicked');
+        
         // Use Firebase auth module if available
         if (window.FirebaseAuth && window.FirebaseAuth.signOut) {
+            console.log('🔥 Using Firebase sign out');
             window.FirebaseAuth.signOut().then(() => {
+                console.log('✅ Firebase sign out successful');
                 this.updateUserProfile(null);
                 this.closeProfileMenu();
                 this.showNotification('Successfully signed out!', 'success');
@@ -211,16 +253,21 @@ class SupplierDashboard {
                     window.location.href = '../Login Page Supplier/index.html';
                 }, 1500);
             }).catch((error) => {
-                console.error('Sign out error:', error);
+                console.error('❌ Firebase sign out error:', error);
                 this.showNotification('Sign out failed. Please try again.', 'error');
             });
         } else {
+            console.log('📦 Using localStorage sign out');
             // Fallback for demo users
             localStorage.removeItem('currentUser');
             localStorage.removeItem('isAuthenticated');
             this.updateUserProfile(null);
             this.closeProfileMenu();
             this.showNotification('Successfully signed out!', 'success');
+            // Redirect to login page
+            setTimeout(() => {
+                window.location.href = '../Login Page Supplier/index.html';
+            }, 1500);
         }
     }
 
@@ -230,6 +277,7 @@ class SupplierDashboard {
         const signinBtn = document.getElementById('signin-btn');
         const signoutBtn = document.getElementById('signout-btn');
 
+        console.log('🔍 updateUserProfile called with user:', user);
         console.log('🔍 Profile elements found:', {
             profileName: !!profileName,
             profileEmail: !!profileEmail,
@@ -242,20 +290,55 @@ class SupplierDashboard {
             const displayName = user.displayName || user.username || user.email?.split('@')[0] || 'Supplier';
             const email = user.email || 'supplier@example.com';
             
-            if (profileName) profileName.textContent = displayName;
-            if (profileEmail) profileEmail.textContent = email;
+            console.log('👤 Processing user data:', { displayName, email, originalUser: user });
             
-            if (signinBtn) signinBtn.classList.add('hidden');
-            if (signoutBtn) signoutBtn.classList.remove('hidden');
+            if (profileName) {
+                profileName.textContent = displayName;
+                console.log('✅ Profile name updated to:', displayName);
+            } else {
+                console.error('❌ Profile name element not found');
+            }
             
-            console.log('✅ Supplier profile updated:', { displayName, email });
+            if (profileEmail) {
+                profileEmail.textContent = email;
+                console.log('✅ Profile email updated to:', email);
+            } else {
+                console.error('❌ Profile email element not found');
+            }
+            
+            if (signinBtn) {
+                signinBtn.classList.add('hidden');
+                console.log('✅ Sign in button hidden');
+            }
+            
+            if (signoutBtn) {
+                signoutBtn.classList.remove('hidden');
+                console.log('✅ Sign out button shown');
+            }
+            
+            console.log('✅ Supplier profile updated successfully');
         } else {
-            if (profileName) profileName.textContent = 'Guest User';
-            if (profileEmail) profileEmail.textContent = 'guest@example.com';
+            console.log('👤 No user provided, setting guest mode');
             
-            if (signinBtn) signinBtn.classList.remove('hidden');
-            if (signoutBtn) signoutBtn.classList.add('hidden');
-```
+            if (profileName) {
+                profileName.textContent = 'Guest User';
+                console.log('✅ Profile name set to Guest User');
+            }
+            
+            if (profileEmail) {
+                profileEmail.textContent = 'guest@example.com';
+                console.log('✅ Profile email set to guest@example.com');
+            }
+            
+            if (signinBtn) {
+                signinBtn.classList.remove('hidden');
+                console.log('✅ Sign in button shown');
+            }
+            
+            if (signoutBtn) {
+                signoutBtn.classList.add('hidden');
+                console.log('✅ Sign out button hidden');
+            }
             
             console.log('👤 Profile set to guest mode');
         }
@@ -285,11 +368,11 @@ class SupplierDashboard {
         
         // Calculate estimated revenue saved (dummy calculation)
         const totalQuantity = this.products.reduce((sum, p) => sum + p.quantity, 0);
-        const revenueSaved = Math.round(totalQuantity * 35 / 1000); // Approx ₹35 per kg
+        const revenueSaved = Math.round(totalQuantity * 35 / 1000); // Approx Rs.35 per kg
 
         document.getElementById('total-products').textContent = totalProducts;
         document.getElementById('expiring-soon').textContent = expiringSoon;
-        document.getElementById('revenue-saved').textContent = `₹${revenueSaved}k`;
+        document.getElementById('revenue-saved').textContent = `Rs.${revenueSaved}k`;
     }
 
     getDaysUntilExpiry(expiryDate) {
@@ -755,17 +838,17 @@ class SupplierDashboard {
         const recommendations = [];
         
         if (riskScore > 50) {
-            recommendations.push("⚠️ High spoilage risk detected! Consider immediate sale or processing.");
-            recommendations.push("🧊 Implement enhanced cold chain management.");
-            recommendations.push("📢 Market this batch as 'quick sale' items with discounted pricing.");
+            recommendations.push("High spoilage risk detected! Consider immediate sale or processing.");
+            recommendations.push("Implement enhanced cold chain management.");
+            recommendations.push("Market this batch as 'quick sale' items with discounted pricing.");
         } else if (riskScore > 25) {
-            recommendations.push("⚡ Monitor conditions closely and prioritize this batch for distribution.");
-            recommendations.push("📦 Consider upgrading packaging quality.");
-            recommendations.push("🚚 Expedite transportation to reduce shelf time.");
+            recommendations.push("Monitor conditions closely and prioritize this batch for distribution.");
+            recommendations.push("Consider upgrading packaging quality.");
+            recommendations.push("Expedite transportation to reduce shelf time.");
         } else {
-            recommendations.push("✅ Low spoilage risk - product is in excellent condition.");
-            recommendations.push("📈 Suitable for extended storage or long-distance transport.");
-            recommendations.push("💰 Premium pricing recommended for high-quality produce.");
+            recommendations.push("Low spoilage risk - product is in excellent condition.");
+            recommendations.push("Suitable for extended storage or long-distance transport.");
+            recommendations.push("Premium pricing recommended for high-quality produce.");
         }
 
         // Specific recommendations based on conditions
@@ -776,15 +859,15 @@ class SupplierDashboard {
         
         const optimalTemp = optimalTemps[data.commodity] || 10;
         if (Math.abs(data.temperature - optimalTemp) > 5) {
-            recommendations.push(`🌡️ Adjust temperature closer to ${optimalTemp}°C for optimal storage.`);
+            recommendations.push(`Temperature Alert: Adjust temperature closer to ${optimalTemp}°C for optimal storage.`);
         }
 
         if (data.daysSinceHarvest > 7) {
-            recommendations.push("📅 Product has been in storage for extended period - prioritize for sale.");
+            recommendations.push("Calendar Alert: Product has been in storage for extended period - prioritize for sale.");
         }
 
         if (data.transportDuration > 24) {
-            recommendations.push("🚛 Long transport duration detected - consider local markets first.");
+            recommendations.push("Transport Alert: Long transport duration detected - consider local markets first.");
         }
 
         return recommendations;
@@ -796,39 +879,39 @@ class SupplierDashboard {
         
         // Risk-based recommendations for suppliers
         if (prediction.Risk_Interpretation === 'High Risk') {
-            recommendations.push("🚨 HIGH SPOILAGE RISK! Immediate action required.");
-            recommendations.push("💨 Emergency sale, processing, or donation recommended.");
-            recommendations.push("📢 Market as 'quick sale' with discounted pricing.");
-            recommendations.push("🧊 Implement maximum cold chain protocols.");
+            recommendations.push("HIGH SPOILAGE RISK! Immediate action required.");
+            recommendations.push("Emergency sale, processing, or donation recommended.");
+            recommendations.push("Market as 'quick sale' with discounted pricing.");
+            recommendations.push("Implement maximum cold chain protocols.");
         } else if (prediction.Risk_Interpretation === 'Medium Risk') {
-            recommendations.push("⚡ Medium risk detected - prioritize for distribution.");
-            recommendations.push("🚚 Expedite transportation to reduce storage time.");
-            recommendations.push("📦 Consider upgrading storage conditions.");
-            recommendations.push("💰 Standard pricing with quick turnover strategy.");
+            recommendations.push("Medium risk detected - prioritize for distribution.");
+            recommendations.push("Expedite transportation to reduce storage time.");
+            recommendations.push("Consider upgrading storage conditions.");
+            recommendations.push("Standard pricing with quick turnover strategy.");
         } else {
-            recommendations.push("✅ Low spoilage risk - product is in excellent condition.");
-            recommendations.push("📈 Suitable for extended storage or long-distance transport.");
-            recommendations.push("💰 Premium pricing recommended for high-quality produce.");
-            recommendations.push("🌟 Market as premium quality items.");
+            recommendations.push("Low spoilage risk - product is in excellent condition.");
+            recommendations.push("Suitable for extended storage or long-distance transport.");
+            recommendations.push("Premium pricing recommended for high-quality produce.");
+            recommendations.push("Market as premium quality items.");
         }
 
         // Add shelf life information
         if (prediction.Estimated_Shelf_Life) {
-            recommendations.push(`📅 Estimated shelf life: ${prediction.Estimated_Shelf_Life} days`);
+            recommendations.push(`Shelf Life: Estimated shelf life: ${prediction.Estimated_Shelf_Life} days`);
         }
 
         // Add model confidence for supplier decision making
         if (prediction.Confidence) {
             const confidence = Math.round(prediction.Confidence * 100);
-            recommendations.push(`🎯 Model confidence: ${confidence}%`);
+            recommendations.push(`Model Confidence: ${confidence}%`);
             if (confidence < 70) {
-                recommendations.push("⚠️ Lower confidence - consider additional quality checks.");
+                recommendations.push("Warning: Lower confidence - consider additional quality checks.");
             }
         }
 
         // Add business insights
         if (prediction.Model_Version) {
-            recommendations.push(`🤖 Prediction powered by ML Model ${prediction.Model_Version}`);
+            recommendations.push(`AI Model: Prediction powered by ML Model ${prediction.Model_Version}`);
         }
 
         return recommendations;
@@ -925,6 +1008,54 @@ class SupplierDashboard {
 
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('🌐 DOM Content Loaded');
+    
+    // Debug: Check if profile elements exist
+    const profileBtn = document.getElementById('profile-btn');
+    const profileMenu = document.getElementById('profile-menu');
+    const signoutBtn = document.getElementById('signout-btn');
+    
+    console.log('🔍 Profile Debug Check:');
+    console.log('- Profile button found:', !!profileBtn);
+    console.log('- Profile menu found:', !!profileMenu);
+    console.log('- Sign out button found:', !!signoutBtn);
+    
+    if (profileBtn) {
+        console.log('- Profile button classes:', profileBtn.className);
+        console.log('- Profile button text:', profileBtn.textContent);
+    }
+    
+    if (profileMenu) {
+        console.log('- Profile menu classes:', profileMenu.className);
+        console.log('- Profile menu hidden:', profileMenu.classList.contains('hidden'));
+    }
+    
+    // Simple test click handler
+    if (profileBtn) {
+        profileBtn.addEventListener('click', () => {
+            console.log('🖱️ DIRECT PROFILE BUTTON CLICK TEST');
+            if (profileMenu) {
+                profileMenu.classList.toggle('show');
+                profileBtn.classList.toggle('active');
+                console.log('📋 Menu toggled directly. Show class:', profileMenu.classList.contains('show'));
+            }
+        });
+    }
+    
+    // Debug localStorage contents
+    console.log('🔍 localStorage contents:');
+    console.log('- currentUser:', localStorage.getItem('currentUser'));
+    console.log('- isAuthenticated:', localStorage.getItem('isAuthenticated'));
+    
+    // Force reload user profile after short delay
+    setTimeout(() => {
+        console.log('🔄 Force reloading user profile...');
+        if (window.dashboard) {
+            window.dashboard.loadUserProfile();
+        }
+    }, 1000);
+    
+    // Initialize the dashboard
     window.dashboard = new SupplierDashboard();
 });
 
